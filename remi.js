@@ -5,8 +5,6 @@ const auth = require('./auth.json');
 const readline = require('readline');
 const fs = require('fs');
 
-const mon_db = [];
-
 const three_star_drops = [];
 const four_star_drops = [];
 const five_star_drops = [];
@@ -71,37 +69,18 @@ readGFE.on('line', function(line) {
     GFE.push(mon);
 });
 
-// const readInterface = readline.createInterface({
-//     input: fs.createReadStream(`${process.env.WINHOME}Androo/bots/remy/rem_urls.txt`)
-// });
-
-// readInterface.on('line', function(line) {
-//     let newline = line.split('@')
-//     let mon = {
-//         name: newline[1],
-//         url: newline[0]
-//     }
-//     mon_db.push(mon);
-//     // console.log(`${mon.name}, ${mon.url}`);
-// });
-
-
 function rollMonster() {
     tier = Math.floor(Math.random() * 100) + 1;
     let drop;
 
     if (tier <= 10) {
         drop = three_star_drops[Math.floor(Math.random() * three_star_drops.length)];
-        console.log(`Rolled three star ${drop}`);
     } else if (tier > 10 && tier <= 45) {
         drop = four_star_drops[Math.floor(Math.random() * four_star_drops.length)];
-        console.log(`Rolled four star ${drop}`);
     } else if (tier > 45 && tier <= 90) {
         drop = five_star_drops[Math.floor(Math.random() * five_star_drops.length)];
-        console.log(`Rolled five star ${drop}`);
     } else {
         drop = GFE[Math.floor(Math.random() * GFE.length)];
-        console.log(`Rolled five star god ${drop}`);
     }
     let roll = {
         url: drop.url,
@@ -109,6 +88,13 @@ function rollMonster() {
     };
 
     return roll;
+}
+
+function getTimeStamp() {
+    var today = new Date();
+    var date = today.getMonth() + '/' + today.getDay() + '/' + today.getFullYear();
+    var time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+    return date + ' ' + time;
 }
 
 // output console log when bot is logged in
@@ -123,6 +109,7 @@ client.on('message', msg => {
         return;
     var args = msg.content.substring(1).split(' ');
     var cmd = args[0];
+    var timestamp = getTimeStamp();
        
     args = args.splice(1);
 
@@ -132,14 +119,14 @@ client.on('message', msg => {
         break;
         case 'roll':
             roll = rollMonster();
-            msg.reply(`You rolled ${roll.name}!`, {files:[roll.url]});
-            // TODO: add logging
+            msg.channel.send(`**${msg.author.username}** rolled **${roll.name}**!`, {files:[roll.url]});
+            // console.log(`${Object.getOwnPropertyNames(msg.author)}`);
+            console.log(`[${timestamp} LOGGING]: ${msg.author.username} rolled ${roll.name}`);
         break;
         case 'test':
             console.log(`three_star_drops[0]: ${three_star_drops[0].name}`)
     }
 });
-
 
 // login to the bot
 client.login(auth.token);
