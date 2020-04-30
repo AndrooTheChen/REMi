@@ -1,10 +1,16 @@
+// remij.s
+// =======
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const auth = require('./auth.json');
 
+const hello = require('./hello');
+
+// for parsing text files
 const readline = require('readline');
 const fs = require('fs');
 
+// store monsters in arrays
 const three_star_drops = [];
 const four_star_drops = [];
 const five_star_drops = [];
@@ -12,20 +18,22 @@ const five_star_gods = [];
 const GFE = [];
 
 // Read in the monsters, segregate, and store
+const monFile = `${process.env.WINHOME}Androo/bots/remy/monsters`;
+
 const readThreeStar = readline.createInterface({
-    input: fs.createReadStream(`${process.env.WINHOME}Androo/bots/remy/three_star_drops.txt`)
+    input: fs.createReadStream(`${monFile}/three_star_drops.txt`)
 });
 const readFourStar = readline.createInterface({
-    input: fs.createReadStream(`${process.env.WINHOME}Androo/bots/remy/four_star_drops.txt`)
+    input: fs.createReadStream(`${monFile}/four_star_drops.txt`)
 });
 const readFiveStar = readline.createInterface({
-    input: fs.createReadStream(`${process.env.WINHOME}Androo/bots/remy/five_star_drops.txt`)
+    input: fs.createReadStream(`${monFile}/five_star_drops.txt`)
 });
 const readFiveStarGod = readline.createInterface({
-    input: fs.createReadStream(`${process.env.WINHOME}Androo/bots/remy/five_star_gods.txt`)
+    input: fs.createReadStream(`${monFile}/five_star_gods.txt`)
 });
 const readGFE= readline.createInterface({
-    input: fs.createReadStream(`${process.env.WINHOME}Androo/bots/remy/GFE.txt`)
+    input: fs.createReadStream(`${monFile}/GFE.txt`)
 });
 
 readThreeStar.on('line', function(line) {
@@ -113,18 +121,38 @@ client.on('message', msg => {
        
     args = args.splice(1);
 
+    // Commands:
     switch(cmd) {
+        // simple ping cmd
         case 'ping':
             msg.reply("pong!");
         break;
+
+        // roll from the rare egg machine
         case 'roll':
             roll = rollMonster();
             msg.channel.send(`**${msg.author.username}** rolled **${roll.name}**!`, {files:[roll.url]});
             // console.log(`${Object.getOwnPropertyNames(msg.author)}`);
             console.log(`[${timestamp} LOGGING]: ${msg.author.username} rolled ${roll.name}`);
         break;
+
+        // test
         case 'test':
-            console.log(`three_star_drops[0]: ${three_star_drops[0].name}`)
+            console.log(`three_star_drops[0]: ${three_star_drops[0].name}`);
+        break;
+
+        // print all cmds
+        case 'help':
+            msg.channel.send(`**%roll** - roll for a monster!\n**%help** - list commands`);
+        break;
+        
+        case 'hello':
+            hello.printHello();
+        break;
+
+        case 'add':
+            hello.addTwo(400, 6);
+        break;
     }
 });
 
