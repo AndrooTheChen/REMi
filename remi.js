@@ -3,11 +3,11 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const auth = require('./auth.json');
-
-// const hello = require('./hello');
+const mongoUser = require('./mongoUsers');
+const hello = require('./hello');
 
 // import Mongodb client
-const {MongoClient} = require("mongodb");
+// const {MongoClient} = require("mongodb");
 
 // for parsing text files
 const readline = require('readline');
@@ -154,7 +154,9 @@ client.on('message', msg => {
 
         // %test
         case 'test':
-            console.log(`three_star_drops[0]: ${three_star_drops[0].name}`);
+            console.log(`Testing checkUser`);
+            mongoUser.checkUser(msg.author.username);
+            console.log(`userCheck finished`);
         break;
 
         // %help
@@ -169,6 +171,11 @@ client.on('message', msg => {
         case 'add':
             hello.addTwo(400, 6);
         break;
+        
+        case 'bye':
+            hello.printBye();
+        break;
+
     }
 });
 
