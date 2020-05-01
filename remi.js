@@ -21,7 +21,8 @@ const five_star_gods = [];
 const GFE = [];
 
 // Read in the monsters, segregate, and store
-const monFile = `${process.env.WINHOME}Androo/bots/remy/monsters`;
+// const monFile = `${process.env.WINHOME}Androo/bots/remy/monsters`;
+const monFile = `${process.env.HOME}/Workspace/remi/monsters`;
 
 const readThreeStar = readline.createInterface({
     input: fs.createReadStream(`${monFile}/three_star_drops.txt`)

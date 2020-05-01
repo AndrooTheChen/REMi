@@ -11,7 +11,7 @@ module.exports = {
  * users collection in the DB. If not, create an entry.
  * @param {string} user Username of user calling function
  */
-function checkUser(user) {
+async function checkUser(user) {
     // connect to DB
     const {MongoClient} = require("mongodb");
     const uri = "mongodb://localhost:27017";
@@ -26,7 +26,7 @@ function checkUser(user) {
         const users = db.collection("users");
 
         // verify user exists in collection
-        users.findOne({"username":user}, function(err, result){
+        users.findOne({"username":user}, async function(err, result){
             if (err || result == None) {
                 // add new user to collection
                 console.log(`${user} is not yet registered.`);
