@@ -1,4 +1,4 @@
-// util.js
+// rutil.js
 // =======
 module.exports = {
     log,

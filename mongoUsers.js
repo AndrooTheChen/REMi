@@ -1,6 +1,6 @@
 // mongoUsers.js
 // =============
-const util = require(`./util`);
+const rutil = require(`./rutil`);
 
 // connect to DB
 const {MongoClient} = require("mongodb");
@@ -42,14 +42,12 @@ async function connectDB() {
         
         // query for collection
         const db = mongo_client.db("remiDB");
-        util.log(`Connected to database ${db.databaseName}`);
+        rutil.log(`Connected to database ${db.databaseName}`);
         // const users = db.collection("users");s
         return `success`;
     } catch (ex) {
-        util.err(`Connection failed! Error: ${ex}`);
+        rutil.err(`Connection failed! Error: ${ex}`);
         return `fail`;
-    } finally {
-        util.log(`Connection attempt finished.`);
     }
 }
 
@@ -62,14 +60,14 @@ async function checkUser(user) {
     try {
         // get collection
         const db = mongo_client.db("remiDB");
-        util.log(`Connected to database ${db.databaseName}`);
+        rutil.log(`Connected to database ${db.databaseName}`);
         const users = db.collection("users");
 
         // verify user exists in collection
         users.findOne({"username":user}, function(err, result){
             if (err || result == null) {
                 // add new user to collection
-                util.log(`${user} is not yet registered.`);
+                rutil.log(`${user} is not yet registered.`);
                 const insertCursor = users.insertOne({
                     "username": user,
                     "numRolls": 10,
@@ -79,15 +77,15 @@ async function checkUser(user) {
                     "monPts": 0,
                     "rolls": [],
                 });
-                util.log(`Sucessfully inserted ${insertCursor.insertedCount} entry for ${user}`);
+                rutil.log(`Sucessfully inserted ${insertCursor.insertedCount} entry for ${user}`);
             } else {
-                util.log (`user ${user} already in ${db.databaseName}`);
+                rutil.log (`User ${user} already in ${db.databaseName}`);
             }
         });
     } catch (ex) {
-        util.err(`Connection failed! Error: ${ex}`);
+        rutil.err(`Connection failed! Error: ${ex}`);
     } finally {
-        util.log(`Don't close TCP connection`);
+        rutil.log(`Don't close TCP connection`);
         // await mongo_client.close();
     }
 }
