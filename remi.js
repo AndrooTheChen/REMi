@@ -141,6 +141,11 @@ client.on('message', msg => {
             msg.reply("pong!");
         break;
 
+        // %help
+        case 'help':
+            msg.channel.send(`**%roll** - roll for a monster!\n**%help** - list commands`);
+        break;
+
         // %roll
         case 'roll':
             roll = rollMonster();
@@ -148,6 +153,8 @@ client.on('message', msg => {
             // console.log(`${Object.getOwnPropertyNames(msg.author)}`);
             util.log(`${msg.author.username} rolled ${roll.name}`);
         break;
+
+        // DEBUG ========================================
 
         // %test
         case 'test':
@@ -165,22 +172,7 @@ client.on('message', msg => {
             mongoUser.printCollections();
         break;
 
-        // %help
-        case 'help':
-            msg.channel.send(`**%roll** - roll for a monster!\n**%help** - list commands`);
-        break;
-        
-        case 'hello':
-            hello.printHello();
-        break;
-
-        case 'add':
-            hello.addTwo(400, 6);
-        break;
-        
-        case 'bye':
-            hello.printBye();
-        break;
+        // DEBUG ========================================
 
     }
 });
