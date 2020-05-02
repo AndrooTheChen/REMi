@@ -1,9 +1,23 @@
 // mongoUsers.js
 // =============
+// const async = require ("async");
 
 module.exports = {
     checkUser,
     claimMonster,
+}
+
+function insertUser(users, user) {
+    const insertCursor = users.insertOne({
+        "username": user,
+        "numRolls": 10,
+        "numClaims": 3,
+        "lastRollTime": "",
+        "lastClaimTime": "",
+        "monPts": 0,
+        "rolls": [],
+    });
+    console.log(`Sucessfully inserted ${insertCursor.insertedCount} entry for ${user}`);
 }
 
 /**
@@ -19,19 +33,18 @@ async function checkUser(user) {
 
     try {
         await client.connect();
-
+        
         // get collection
         const db = client.db("remiDB");
         console.log(`Connected to database ${db.databaseName}`);
         const users = db.collection("users");
 
         // verify user exists in collection
-        users.findOne({"username":user}, async function(err, result){
-            if (err || result == None) {
+        users.findOne({"username":user}, function(err, result){
+            if (err || result == null) {
                 // add new user to collection
                 console.log(`${user} is not yet registered.`);
-
-                const insertCursor = await users.insertOne({
+                const insertCursor = users.insertOne({
                     "username": user,
                     "numRolls": 10,
                     "numClaims": 3,
@@ -46,9 +59,12 @@ async function checkUser(user) {
     } catch (ex) {
         console.log(`Connection failed! Error: ${ex}`);
     } finally {
-        console.log(`Closing TCP connection`);
-        client.close();
+        console.log(`Don't close TCP connection`);
+        await client.close();
     }
+
+    
+    
 }
 
 /**
