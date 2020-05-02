@@ -9,27 +9,13 @@ const hello = require('./hello');
 // connect to DB
 const {MongoClient} = require("mongodb");
 const uri = "mongodb://localhost:27017";
-const mongo_client = new MongoClient(uri);
+const mongo_client = new MongoClient(uri, { useUnifiedTopology: true });
 
 // get collection
-const users = connectDB(mongo_client).then();
+mongoUser.connectDB(mongo_client).then((status) => {
+    console.log(`connectDB returned: ${status}`);
+});
 
-async function connectDB(mongo_client) {
-    try {
-        await mongo_client.connect();
-        
-        // query for collection
-        const db = mongo_client.db("remiDB");
-        console.log(`Connected to database ${db.databaseName}`);
-        const users = db.collection("users");
-    } catch (ex) {
-        console.log(`Connection failed! Error: ${ex}`);
-    } finally {
-        console.log(`Connection attempt finished.`);
-    }
-
-    return users;
-}
 
 // for parsing text files
 const readline = require('readline');
@@ -208,5 +194,6 @@ client.login(auth.token);
 // shut down REMi
 process.on('SIGINT', () => {
     console.log(`\nSIGINT received! Shutting down REMi`);
+    mongo_client.close();
     process.exit(0);
 });

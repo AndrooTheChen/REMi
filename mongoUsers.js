@@ -5,6 +5,27 @@
 module.exports = {
     checkUser,
     claimMonster,
+    connectDB,
+}
+
+async function connectDB(mongo_client) {
+    try {
+        await mongo_client.connect({
+            useUnifiedTopology: true,
+            useNewUrlParser: true,
+        });
+        
+        // query for collection
+        const db = mongo_client.db("remiDB");
+        console.log(`Connected to database ${db.databaseName}`);
+        const users = db.collection("users");
+        return `success`;
+    } catch (ex) {
+        console.log(`Connection failed! Error: ${ex}`);
+        return `fail`;
+    } finally {
+        console.log(`Connection attempt finished.`);
+    }
 }
 
 function insertUser(users, user) {
@@ -27,13 +48,13 @@ function insertUser(users, user) {
  */
 async function checkUser(user) {
     // connect to DB
-    const {MongoClient} = require("mongodb");
-    const uri = "mongodb://localhost:27017";
-    const client = new MongoClient(uri);
+    // const {MongoClient} = require("mongodb");
+    // const uri = "mongodb://localhost:27017";
+    // const client = new MongoClient(uri);
 
     try {
-        await client.connect();
-        
+        // await client.connect();
+
         // get collection
         const db = client.db("remiDB");
         console.log(`Connected to database ${db.databaseName}`);
@@ -62,9 +83,6 @@ async function checkUser(user) {
         console.log(`Don't close TCP connection`);
         await client.close();
     }
-
-    
-    
 }
 
 /**
