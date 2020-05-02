@@ -4,16 +4,16 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 const auth = require('./auth.json');
 const mongoUser = require('./mongoUsers');
-const hello = require('./hello');
-
-// connect to DB
-const {MongoClient} = require("mongodb");
-const uri = "mongodb://localhost:27017";
-const mongo_client = new MongoClient(uri, { useUnifiedTopology: true });
+const util = require ('./util');
 
 // get collection
-mongoUser.connectDB(mongo_client).then((status) => {
-    console.log(`connectDB returned: ${status}`);
+mongoUser.connectDB().then((status) => {
+    if (status == `success`) {
+        util.log(`connectDB returned: ${status}`);
+    } else {
+        console.warn(`connectDB returned failure, shutting down`);
+        process.exit(1);
+    }
 });
 
 
@@ -115,14 +115,14 @@ function rollMonster() {
 }
 
 /**
- * Return the current time stamp.
- * @return HH:MM:SS time stamp as string
+ * Log the given message with a time stamp to the console.
+ * @param {string} msg Message to be logged
  */
-function getTimeStamp() {
-    var today = new Date();
-    var date = today.getMonth() + '/' + today.getDay() + '/' + today.getFullYear();
-    var time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
-    return date + ' ' + time;
+function log(msg) {
+    const today = new Date();
+    const date = (today.getUTCMonth() +  1) + '/' + today.getUTCDay() + '/' + today.getFullYear();
+    const time = today.getUTCHours() + ':' + today.getUTCMinutes() + ':' + today.getUTCSeconds();
+    console.log(`[${date + ' ' + time} LOGGING] ${msg}`);
 }
 
 /**
@@ -142,7 +142,6 @@ client.on('message', msg => {
         return;
     var args = msg.content.substring(1).split(' ');
     var cmd = args[0];
-    var timestamp = getTimeStamp();
        
     args = args.splice(1);
 
@@ -158,7 +157,7 @@ client.on('message', msg => {
             roll = rollMonster();
             msg.channel.send(`**${msg.author.username}** rolled **${roll.name}**!`, {files:[roll.url]});
             // console.log(`${Object.getOwnPropertyNames(msg.author)}`);
-            console.log(`[${timestamp} LOGGING]: ${msg.author.username} rolled ${roll.name}`);
+            util.log(`${msg.author.username} rolled ${roll.name}`);
         break;
 
         // %test
@@ -193,7 +192,7 @@ client.login(auth.token);
 
 // shut down REMi
 process.on('SIGINT', () => {
-    console.log(`\nSIGINT received! Shutting down REMi`);
-    mongo_client.close();
+    util.warn(`\nSIGINT received! Shutting down REMi`);
+    mongoUser.mongo_client.close();
     process.exit(0);
 });

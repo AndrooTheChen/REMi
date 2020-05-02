@@ -1,14 +1,20 @@
 // mongoUsers.js
 // =============
-// const async = require ("async");
+
+// connect to DB
+const {MongoClient} = require("mongodb");
+const uri = "mongodb://localhost:27017";
+const mongo_client = new MongoClient(uri, { useUnifiedTopology: true });
+module.export = {"mongo_client": mongo_client};
 
 module.exports = {
     checkUser,
     claimMonster,
     connectDB,
+    "mongo_client" : mongo_client,
 }
 
-async function connectDB(mongo_client) {
+async function connectDB() {
     try {
         await mongo_client.connect({
             useUnifiedTopology: true,
