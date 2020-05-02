@@ -6,7 +6,7 @@ const auth = require('./auth.json');
 const mongoUser = require('./mongoUsers');
 const util = require ('./util');
 
-// get collection
+// connect to database
 mongoUser.connectDB().then((status) => {
     if (status == `success`) {
         util.log(`connectDB returned: ${status}`);
@@ -115,17 +115,6 @@ function rollMonster() {
 }
 
 /**
- * Log the given message with a time stamp to the console.
- * @param {string} msg Message to be logged
- */
-function log(msg) {
-    const today = new Date();
-    const date = (today.getUTCMonth() +  1) + '/' + today.getUTCDay() + '/' + today.getFullYear();
-    const time = today.getUTCHours() + ':' + today.getUTCMinutes() + ':' + today.getUTCSeconds();
-    console.log(`[${date + ' ' + time} LOGGING] ${msg}`);
-}
-
-/**
  * Output console log when bot is logged in.
  */
 client.on('ready', () => {
@@ -165,6 +154,15 @@ client.on('message', msg => {
             console.log(`Testing checkUser`);
             mongoUser.checkUser(msg.author.username);
             console.log(`userCheck finished`);
+        break;
+
+        // print db
+        case `print`:
+            mongoUser.printDB();
+        break;
+
+        case `collections`:
+            mongoUser.printCollections();
         break;
 
         // %help
