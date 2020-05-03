@@ -12,6 +12,7 @@ module.export = {"mongo_client": mongo_client};
 
 module.exports = {
     checkUser,
+    checkRolls,
     checkClaims,
     claimMonster,
     connectDB,
@@ -69,8 +70,26 @@ async function connectDB() {
 }
 
 /**
- * Allow the user to check how many claims they currently
+ * Allow the user to check how many rolls they currently
  * have. This function simply queries the numRolls field in
+ * remiDB.users
+ * @param {string} user Username of user calling function
+ */
+async function checkRolls(user) {
+    rutil.log(`checking ${user}'s rolls`);
+    try {
+        const users = db.collection("users");
+        const user_entry = await users.findOne({"username": user});
+        return user_entry.numRolls;
+    } catch(ex) {
+        rutil.err(`Connection failed! Error: ${ex}`);
+    }
+    rutil.log(`finished checking rolls`);
+}
+
+/**
+ * Allow the user to check how many claims they currently
+ * have. This function simply queries the numClaims field in
  * remiDB.users
  * @param {string} user Username of user calling function
  */
@@ -79,9 +98,9 @@ async function checkClaims(user) {
     try {
         const users = db.collection("users");
         const user_entry = await users.findOne({"username": user});
-        return user_entry.numRolls;
+        return user_entry.numClaims;
     } catch(ex) {
-        rutil.err(`Connection failed! Error: ${ex}`)
+        rutil.err(`Connection failed! Error: ${ex}`);
     }
     rutil.log(`finished checking claims`);
 }

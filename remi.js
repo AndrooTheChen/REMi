@@ -58,11 +58,19 @@ client.on('message', msg => {
             rutil.log(`${msg.author.username} rolled ${roll.name}`);
         break;
 
+        // %myrolls
+        case 'myrolls':
+        case 'mr':
+            mongoUser.checkRolls(msg.author.username).then((rolls) => {
+                msg.channel.send(`**${msg.author.username}** you currently have ${rolls} rolls`);
+            });
+        break;
+
         // %myclaims
         case 'myclaims':
         case 'mc':
             mongoUser.checkClaims(msg.author.username).then((claims) => {
-                msg.channel.send(`**${msg.author.username}** you have ${claims}`);
+                msg.channel.send(`**${msg.author.username}** you currently have ${claims} claims`);
             });
         break;
 
