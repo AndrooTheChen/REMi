@@ -57,6 +57,21 @@ client.on('message', msg => {
             rutil.log(`${msg.author.username} rolled ${roll.name}`);
         break;
 
+        // %claims
+        case 'claims':
+            // let numClaims;
+            let numClaims = mongoUser.checkClaims(msg.author.username);
+            
+            mongoUser.checkClaims(msg.author.username).then((claims) => {
+                rutil.log(`checkClaims returned:${numClaims}\n typeof:${typeof numClaims}`);
+                numClaims = claims;
+                msg.channel.send(`**${msg.author.username}** you have ${numClaims}`);
+            });
+            //mongoUser.checkClaims(msg.author.username).then(numClaims);
+
+
+        break;
+
         // DEBUG ========================================
 
         // %test

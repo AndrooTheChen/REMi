@@ -6,10 +6,13 @@ const rutil = require(`./rutil`);
 const {MongoClient} = require("mongodb");
 const uri = "mongodb://localhost:27017";
 const mongo_client = new MongoClient(uri, { useUnifiedTopology: true });
+let db;
 module.export = {"mongo_client": mongo_client};
+
 
 module.exports = {
     checkUser,
+    checkClaims,
     claimMonster,
     connectDB,
     printDB,
@@ -17,6 +20,11 @@ module.exports = {
     "mongo_client" : mongo_client,
 }
 
+/**
+ * DEBUG
+ * This function is for debuggin only, just to print all
+ * collections in remiDB.
+ */
 function printCollections() {
     const db = mongo_client.db("remiDB");
     db.listCollections().toArray(function (err, results) {
@@ -26,6 +34,11 @@ function printCollections() {
     });
 }
 
+/**
+ * DEBUG
+ * This function is for debuggign only, just to print all
+ * entries in the "users" collection in remiDB.
+ */
 function printDB() {
     const db = mongo_client.db("remiDB");
     db.collection("users").find().toArray(function(err, docs) {
@@ -33,6 +46,10 @@ function printDB() {
     });
 }
 
+/**
+ * Connect to remiDB. This should be called in the beginning.
+ * @return {string} Returns status as `sucess` or `fail`
+ */
 async function connectDB() {
     try {
         await mongo_client.connect({
@@ -41,7 +58,7 @@ async function connectDB() {
         });
         
         // query for collection
-        const db = mongo_client.db("remiDB");
+        db = mongo_client.db("remiDB");
         rutil.log(`Connected to database ${db.databaseName}`);
         // const users = db.collection("users");s
         return `success`;
@@ -51,12 +68,37 @@ async function connectDB() {
     }
 }
 
+async function checkClaims(user) {
+    rutil.log(`checking ${user}'s claims`);
+    try {
+        const users = db.collection("users");
+
+        // users.findOne({"username":user},function (err, result) {
+        //     if (err || result == null) {
+        //         rutil.log(`found nothing: ${typeof result}`);
+        //         return "USER_NOT_FOUND";
+        //     }
+        //     rutil.log(`${Object.getOwnPropertyNames(result)}`);
+        //     rutil.log(`something found, returning ${typeof result}`);
+        //     return JSON.stringify(result);
+        // });
+
+        const user_entry = await users.findOne({"username": user});
+        rutil.log(`returning fields: ${Object.getOwnPropertyNames(user_entry)}`);
+        rutil.log(`returning: ${user_entry.numRolls}`);
+        return user_entry.numRolls;
+    } catch(ex) {
+        rutil.err(`Connection failed! Error: ${ex}`)
+    }
+    rutil.log(`finished checking claims`);
+}
+
 /**
  * Check if the user executing a cmd already exists in the
  * users collection in the DB. If not, create an entry.
  * @param {string} user Username of user calling function
  */
-async function checkUser(user) {
+function checkUser(user) {
     try {
         // get collection
         const db = mongo_client.db("remiDB");
