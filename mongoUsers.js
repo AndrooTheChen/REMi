@@ -68,24 +68,17 @@ async function connectDB() {
     }
 }
 
+/**
+ * Allow the user to check how many claims they currently
+ * have. This function simply queries the numRolls field in
+ * remiDB.users
+ * @param {string} user Username of user calling function
+ */
 async function checkClaims(user) {
     rutil.log(`checking ${user}'s claims`);
     try {
         const users = db.collection("users");
-
-        // users.findOne({"username":user},function (err, result) {
-        //     if (err || result == null) {
-        //         rutil.log(`found nothing: ${typeof result}`);
-        //         return "USER_NOT_FOUND";
-        //     }
-        //     rutil.log(`${Object.getOwnPropertyNames(result)}`);
-        //     rutil.log(`something found, returning ${typeof result}`);
-        //     return JSON.stringify(result);
-        // });
-
         const user_entry = await users.findOne({"username": user});
-        rutil.log(`returning fields: ${Object.getOwnPropertyNames(user_entry)}`);
-        rutil.log(`returning: ${user_entry.numRolls}`);
         return user_entry.numRolls;
     } catch(ex) {
         rutil.err(`Connection failed! Error: ${ex}`)

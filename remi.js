@@ -51,25 +51,19 @@ client.on('message', msg => {
 
         // %roll
         case 'roll':
+        case 'r':
             roll = monster.rollMonster();
             msg.channel.send(`**${msg.author.username}** rolled **${roll.name}**!`, {files:[roll.url]});
             // console.log(`${Object.getOwnPropertyNames(msg.author)}`);
             rutil.log(`${msg.author.username} rolled ${roll.name}`);
         break;
 
-        // %claims
-        case 'claims':
-            // let numClaims;
-            let numClaims = mongoUser.checkClaims(msg.author.username);
-            
+        // %myclaims
+        case 'myclaims':
+        case 'mc':
             mongoUser.checkClaims(msg.author.username).then((claims) => {
-                rutil.log(`checkClaims returned:${numClaims}\n typeof:${typeof numClaims}`);
-                numClaims = claims;
-                msg.channel.send(`**${msg.author.username}** you have ${numClaims}`);
+                msg.channel.send(`**${msg.author.username}** you have ${claims}`);
             });
-            //mongoUser.checkClaims(msg.author.username).then(numClaims);
-
-
         break;
 
         // DEBUG ========================================
