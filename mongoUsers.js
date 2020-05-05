@@ -185,27 +185,27 @@ async function claimMonster(user, name) {
  * @param {string} user Username of user calling function
  * @param {string} name Name of the monster to claim
  */
-async function claimMonsterById(user, id) {
+function claimMonsterById(user, id) {
     const rolled = db.collection("rolled");
-    let output = `FAILED`;
+    let output = 'init';
 
-    // search for desired monster in active rolled collection
-    await rolled.findOne({"claimId": id.toString()}, function(err, result) {
-        if (err || result == null) {
+    // return a promise to search for desired monster in active rolled collection
+    return rolled.findOne({"claimId": id.toString()}).then((result) => {
+        if (result == null) {
             // error, user tried to claim invalid ID
             rutil.err(`${id} not found in 'rolled' collection`);
-            return output;
+            rutil.mlog(`returning FAILED`);
+            return `FAILED`;
         } else {
             // add monster to user's monster box in user collection
             addMonsterToBoxById(user, result.monName);
 
             // remove monster from active collection
             rolled.deleteOne({"claimId": id.toString()});
-            output = result.monName;
+            rutil.mlog(`returning ${result.monName}`);
+            return result.monName;
         }
     });
-    rutil.mlog(`returning ${output}`);
-    return output;
 }
 
 async function addMonsterToBoxById(user, monName) {

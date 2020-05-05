@@ -74,16 +74,14 @@ client.on('message', msg => {
         case 'claimid':
         case 'ci':
             mongoUser.checkUser(msg.author.username);
-            mongoUser.claimMonsterById(msg.author.username, args).then((result) => {
-                rutil.log(`returned: ${result}`);
+            mongoUser.claimMonsterById(msg.author.username, args).then((claimed) => {
+                if (claimed.toString() == `FAILED`) {
+                    msg.channel.send(`**__Error!__** ID ${args} is not a valid ID.`);
+                } else {
+                    msg.channel.send(`**${msg.author.username}** claimed **${claimed.toString()}**!`);
+                    rutil.log(`${msg.author.username} claimed ${claimed}`);
+                }
             });
-            
-            // if (claimed.toString() == `FAILED`) {
-            //     msg.channel.send(`**__Error!__ ID ${args} is not a valid ID.`);
-            // } else {
-            //     msg.channel.send(`**${msg.author.username}** claimed **${claimed.toString()}**! args: ${args}`);
-            // }
-    
         break;
 
         // %myrolls
