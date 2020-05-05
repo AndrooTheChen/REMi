@@ -81,6 +81,8 @@ async function connectDB() {
         // make sure rolled buffer is clear on startup
         await db.collection("rolled").deleteMany();
 
+        // await db.collection("users").deleteMany();
+
         return `success`;
     } catch (ex) {
         rutil.err(`Connection failed! Error: ${ex}`);
@@ -132,39 +134,29 @@ async function checkClaims(user) {
  * @param {string} user Username of user calling function
  */
 function checkUser(user) {
-    try {
-        // get collection
-        const db = mongo_client.db("remiDB");
-        rutil.mlog(`Connected to database ${db.databaseName}`);
-        const users = db.collection("users");
+    const users = db.collection("users");
 
-        // verify user exists in collection
-        users.findOne({"username":user}, function(err, result){
-            if (err || result == null) {
-                // add new user to collection
-                rutil.mlog(`${user} is not yet registered.`);
-                users.insertOne({
-                    "username": user,
-                    "numRolls": 10,
-                    "numClaims": 3,
-                    "lastRollTime": "",
-                    "lastClaimTime": "",
-                    "monPts": 0,
-                    "monBox": [],
-                }).then((result) => {
-                    rutil.mlog(`Sucessfully inserted ${result} entry for ${user}`);
-                });
-                
-            } else {
-                rutil.mlog (`User ${user} already in ${db.databaseName}`);
-            }
-        });
-    } catch (ex) {
-        rutil.err(`Connection failed! Error: ${ex}`);
-    } finally {
-        rutil.mlog(`Don't close TCP connection`);
-        // await mongo_client.close();
-    }
+    // verify user exists in collection
+    users.findOne({"username":user}, function(err, result){
+        if (err || result == null) {
+            // add new user to collection
+            rutil.mlog(`${user} is not yet registered.`);
+            users.insertOne({
+                "username": user,
+                "numRolls": 10,
+                "numClaims": 3,
+                "lastRollTime": "",
+                "lastClaimTime": "",
+                "monPts": 0,
+                "monBox": [],
+            }).then((result) => {
+                rutil.mlog(`Sucessfully inserted ${result} entry for ${user}`);
+            });
+            
+        } else {
+            rutil.mlog (`User ${user} already in ${db.databaseName}`);
+        }
+    });
 }
 
 /**
@@ -179,8 +171,8 @@ async function claimMonster(user, name) {
 }
 
 /**
- * This monster allows the user executing this function to claim
- * the specified monster by ID and add it into their collection. This will
+ * This allows the user executing this function to claim the
+ * specified monster by ID and add it into their collection. This will
  * update that user's entry in the users collection in the database.
  * @param {string} user Username of user calling function
  * @param {string} name Name of the monster to claim
@@ -208,6 +200,11 @@ function claimMonsterById(user, id) {
     });
 }
 
+/**
+ * Add Monster into a user's monster box (monBox) list in users collection.
+ * @param {string} user 
+ * @param {string} monName 
+ */
 async function addMonsterToBoxById(user, monName) {
     const users = db.collection("users");
 
@@ -216,6 +213,13 @@ async function addMonsterToBoxById(user, monName) {
     rutil.mlog(`{Successfully inserted ${monName} in ${user}'s monter box}`);
 }
 
+/**
+ * Add a rolled mosnter to the active "rolled" buffer/collection. This
+ * lets users have the oppurtunity to choose between rolls before
+ * claiming a subset of them.
+ * @param {string} name 
+ * @param {string} url 
+ */
 async function addRollToBuffer(name, url) {
     const rolled = db.collection("rolled");
     const currTime = new Date();

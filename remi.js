@@ -57,11 +57,15 @@ client.on('message', msg => {
             roll = monster.rollMonster();
             mongoUser.addRollToBuffer(roll.name, roll.url).then((claimId) => {
                 rutil.log(`${msg.author.username} rolled ${roll.name} with active rolled ID ${claimId}`);
-                msg.channel.send(`**${msg.author.username}** rolled **${roll.name}**!\n Claim ID is ` +
-                                `**${claimId}**, claim with:\n '%claim **${roll.name}**'\nor\n'%claimid ` +
-                                `**${claimId}**'`, {files:[roll.url]});
+                msg.channel.send(`**${msg.author.username}** rolled **${roll.name}**!`, {files:[roll.url]});
+
+                setTimeout(() => {
+                    msg.channel.send(`Claim ID is **${claimId}**, claim with:\n %claim ` + 
+                    `**${roll.name}**\nor\n%claimid **${claimId}**`)
+                }, 250);
 
             });
+                
         break;
 
         // %claim <monsterName>

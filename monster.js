@@ -1,5 +1,5 @@
 // monster.js
-// ===============
+// ==========
 
 // for parsing text files
 const readline = require('readline');
@@ -69,7 +69,7 @@ readFourStar.on('line', function(line) {
     let newline = line.split('@');
     let mon = {
         url: newline[0],
-        name: newline[1],
+        name: newline[1].toString().substr(1),
     };
     four_star_drops.push(mon);
 });
@@ -77,7 +77,7 @@ readFiveStar.on('line', function(line) {
     let newline = line.split('@');
     let mon = {
         url: newline[0],
-        name: newline[1],
+        name: newline[1].toString().substr(1),
     };
     five_star_drops.push(mon);
 });
@@ -85,7 +85,7 @@ readFiveStarGod.on('line', function(line) {
     let newline = line.split('@');
     let mon = {
         url: newline[0],
-        name: newline[1],
+        name: newline[1].toString().substr(1),
     };
     five_star_gods.push(mon);
 });
@@ -93,7 +93,7 @@ readGFE.on('line', function(line) {
     let newline = line.split('@');
     let mon = {
         url: newline[0],
-        name: newline[1],
+        name: newline[1].toString().substr(1),
     };
     GFE.push(mon);
 });
