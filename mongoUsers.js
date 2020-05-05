@@ -9,21 +9,26 @@ const mongo_client = new MongoClient(uri, { useUnifiedTopology: true });
 let db;
 module.export = {"mongo_client": mongo_client};
 
+// current claim ID cycles 0-999
+let claimId = 0;
 
 module.exports = {
     checkUser,
     checkRolls,
     checkClaims,
     claimMonster,
+    claimMonsterById,
     connectDB,
-    printDB,
+    addRollToBuffer,
+    printUsers,
+    printRolled,
     printCollections,
     "mongo_client" : mongo_client,
 }
 
 /**
  * DEBUG
- * This function is for debuggin only, just to print all
+ * This function is for debugging only, just to print all
  * collections in remiDB.
  */
 function printCollections() {
@@ -37,12 +42,24 @@ function printCollections() {
 
 /**
  * DEBUG
- * This function is for debuggign only, just to print all
+ * This function is for debugging only, just to print all
  * entries in the "users" collection in remiDB.
  */
-function printDB() {
+function printUsers() {
     const db = mongo_client.db("remiDB");
     db.collection("users").find().toArray(function(err, docs) {
+        console.log(JSON.stringify(docs));
+    });
+}
+
+/**
+ * DEBUG
+ * This function is for debugging only, just to print all
+ * entries in the "users" collection in remiDB.
+ */
+function printRolled() {
+    const db = mongo_client.db("remiDB");
+    db.collection("rolled").find().toArray(function(err, docs) {
         console.log(JSON.stringify(docs));
     });
 }
@@ -58,10 +75,12 @@ async function connectDB() {
             useNewUrlParser: true,
         });
         
-        // query for collection
         db = mongo_client.db("remiDB");
-        rutil.log(`Connected to database ${db.databaseName}`);
-        // const users = db.collection("users");s
+        rutil.mlog(`Connected to database ${db.databaseName}`);
+        
+        // make sure rolled buffer is clear on startup
+        await db.collection("rolled").deleteMany();
+
         return `success`;
     } catch (ex) {
         rutil.err(`Connection failed! Error: ${ex}`);
@@ -76,7 +95,7 @@ async function connectDB() {
  * @param {string} user Username of user calling function
  */
 async function checkRolls(user) {
-    rutil.log(`checking ${user}'s rolls`);
+    rutil.mlog(`checking ${user}'s rolls`);
     try {
         const users = db.collection("users");
         const user_entry = await users.findOne({"username": user});
@@ -84,7 +103,7 @@ async function checkRolls(user) {
     } catch(ex) {
         rutil.err(`Connection failed! Error: ${ex}`);
     }
-    rutil.log(`finished checking rolls`);
+    rutil.mlog(`finished checking rolls`);
 }
 
 /**
@@ -94,7 +113,7 @@ async function checkRolls(user) {
  * @param {string} user Username of user calling function
  */
 async function checkClaims(user) {
-    rutil.log(`checking ${user}'s claims`);
+    rutil.mlog(`checking ${user}'s claims`);
     try {
         const users = db.collection("users");
         const user_entry = await users.findOne({"username": user});
@@ -102,44 +121,48 @@ async function checkClaims(user) {
     } catch(ex) {
         rutil.err(`Connection failed! Error: ${ex}`);
     }
-    rutil.log(`finished checking claims`);
+    rutil.mlog(`finished checking claims`);
 }
 
 /**
  * Check if the user executing a cmd already exists in the
- * users collection in the DB. If not, create an entry.
+ * users collection in the DB. If not, create an entry. This function
+ * is not asynchronous because we need to verify user exists in DB
+ * before doing any other operations
  * @param {string} user Username of user calling function
  */
 function checkUser(user) {
     try {
         // get collection
         const db = mongo_client.db("remiDB");
-        rutil.log(`Connected to database ${db.databaseName}`);
+        rutil.mlog(`Connected to database ${db.databaseName}`);
         const users = db.collection("users");
 
         // verify user exists in collection
         users.findOne({"username":user}, function(err, result){
             if (err || result == null) {
                 // add new user to collection
-                rutil.log(`${user} is not yet registered.`);
-                const insertCursor = users.insertOne({
+                rutil.mlog(`${user} is not yet registered.`);
+                users.insertOne({
                     "username": user,
                     "numRolls": 10,
                     "numClaims": 3,
                     "lastRollTime": "",
                     "lastClaimTime": "",
                     "monPts": 0,
-                    "rolls": [],
+                    "monBox": [],
+                }).then((result) => {
+                    rutil.mlog(`Sucessfully inserted ${result} entry for ${user}`);
                 });
-                rutil.log(`Sucessfully inserted ${insertCursor.insertedCount} entry for ${user}`);
+                
             } else {
-                rutil.log (`User ${user} already in ${db.databaseName}`);
+                rutil.mlog (`User ${user} already in ${db.databaseName}`);
             }
         });
     } catch (ex) {
         rutil.err(`Connection failed! Error: ${ex}`);
     } finally {
-        rutil.log(`Don't close TCP connection`);
+        rutil.mlog(`Don't close TCP connection`);
         // await mongo_client.close();
     }
 }
@@ -151,6 +174,62 @@ function checkUser(user) {
  * @param {string} user Username of user calling function
  * @param {string} name Name of the monster to claim
  */
-function claimMonster(user, name) {
+async function claimMonster(user, name) {
 
+}
+
+/**
+ * This monster allows the user executing this function to claim
+ * the specified monster by ID and add it into their collection. This will
+ * update that user's entry in the users collection in the database.
+ * @param {string} user Username of user calling function
+ * @param {string} name Name of the monster to claim
+ */
+async function claimMonsterById(user, id) {
+    const rolled = db.collection("rolled");
+    let output = `FAILED`;
+
+    // search for desired monster in active rolled collection
+    await rolled.findOne({"claimId": id.toString()}, function(err, result) {
+        if (err || result == null) {
+            // error, user tried to claim invalid ID
+            rutil.err(`${id} not found in 'rolled' collection`);
+            return output;
+        } else {
+            // add monster to user's monster box in user collection
+            addMonsterToBoxById(user, result.monName);
+
+            // remove monster from active collection
+            rolled.deleteOne({"claimId": id.toString()});
+            output = result.monName;
+        }
+    });
+    rutil.mlog(`returning ${output}`);
+    return output;
+}
+
+async function addMonsterToBoxById(user, monName) {
+    const users = db.collection("users");
+
+    // add specified monster to users's monster box
+    await users.updateOne({"username": user}, {$addToSet: {monBox: monName.toString()}});
+    rutil.mlog(`{Successfully inserted ${monName} in ${user}'s monter box}`);
+}
+
+async function addRollToBuffer(name, url) {
+    const rolled = db.collection("rolled");
+    const currTime = new Date();
+    await rolled.insertOne({
+        "claimId": claimId.toString(),
+        "monName": name,
+        "monUrl": url,
+        "rollTime": currTime,
+        "isClaimed": false,
+    })
+    rutil.mlog(`${name} successfully added to rolled buffer with ID ${claimId}`);
+    
+    // return ID and update to next unique ID 
+    const oldClaimId = claimId;
+    claimId = (claimId + 1) % 900;
+    return oldClaimId;
 }

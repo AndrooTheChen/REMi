@@ -35,9 +35,10 @@ client.on('message', msg => {
     var args = msg.content.substring(1).split(' ');
     var cmd = args[0];
        
+    // argument for some commands
     args = args.splice(1);
 
-    // Commands:
+    // commands:
     switch(cmd) {
         // %ping
         case 'ping':
@@ -52,15 +53,43 @@ client.on('message', msg => {
         // %roll
         case 'roll':
         case 'r':
+            mongoUser.checkUser(msg.author.username);
             roll = monster.rollMonster();
-            msg.channel.send(`**${msg.author.username}** rolled **${roll.name}**!`, {files:[roll.url]});
-            // console.log(`${Object.getOwnPropertyNames(msg.author)}`);
-            rutil.log(`${msg.author.username} rolled ${roll.name}`);
+            mongoUser.addRollToBuffer(roll.name, roll.url).then((claimId) => {
+                rutil.log(`${msg.author.username} rolled ${roll.name} with active rolled ID ${claimId}`);
+                msg.channel.send(`**${msg.author.username}** rolled **${roll.name}**!\n Claim ID is ` +
+                                `**${claimId}**, claim with:\n '%claim **${roll.name}**'\nor\n'%claimid ` +
+                                `**${claimId}**'`, {files:[roll.url]});
+
+            });
+        break;
+
+        // %claim <monsterName>
+        case 'claim':
+        case 'cn':
+            
+        break;
+
+        // %claimid <claimId
+        case 'claimid':
+        case 'ci':
+            mongoUser.checkUser(msg.author.username);
+            mongoUser.claimMonsterById(msg.author.username, args).then((result) => {
+                rutil.log(`returned: ${result}`);
+            });
+            
+            // if (claimed.toString() == `FAILED`) {
+            //     msg.channel.send(`**__Error!__ ID ${args} is not a valid ID.`);
+            // } else {
+            //     msg.channel.send(`**${msg.author.username}** claimed **${claimed.toString()}**! args: ${args}`);
+            // }
+    
         break;
 
         // %myrolls
         case 'myrolls':
         case 'mr':
+            mongoUser.checkUser(msg.author.username);
             mongoUser.checkRolls(msg.author.username).then((rolls) => {
                 msg.channel.send(`**${msg.author.username}** you currently have ${rolls} rolls`);
             });
@@ -69,6 +98,7 @@ client.on('message', msg => {
         // %myclaims
         case 'myclaims':
         case 'mc':
+            mongoUser.checkUser(msg.author.username);
             mongoUser.checkClaims(msg.author.username).then((claims) => {
                 msg.channel.send(`**${msg.author.username}** you currently have ${claims} claims`);
             });
@@ -85,7 +115,8 @@ client.on('message', msg => {
 
         // print db
         case `print`:
-            mongoUser.printDB();
+            mongoUser.printUsers();
+            mongoUser.printRolled();
         break;
 
         case `collections`:
