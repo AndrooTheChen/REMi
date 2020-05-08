@@ -13,17 +13,19 @@ module.export = {"mongo_client": mongo_client};
 let claimId = 0;
 
 module.exports = {
+    addRollTimestamp,
+    addRollToBuffer,
     checkUser,
     checkRolls,
     checkClaims,
     claimMonster,
     claimMonsterById,
     connectDB,
-    addRollToBuffer,
-    printMonBox,
-    printUsers,
-    printRolled,
+    getRollTimestamp,
     printCollections,
+    printMonBox,
+    printRolled,
+    printUsers,
     "mongo_client" : mongo_client,
 }
 
@@ -95,7 +97,7 @@ async function connectDB() {
  * Allow the user to check how many rolls they currently
  * have. This function simply queries the numRolls field in
  * remiDB.users
- * @param {string} user Username of user calling function
+ * @param {string} user Username for user requesting info
  */
 async function checkRolls(user) {
     rutil.mlog(`checking ${user}'s rolls`);
@@ -113,7 +115,7 @@ async function checkRolls(user) {
  * Allow the user to check how many claims they currently
  * have. This function simply queries the numClaims field in
  * remiDB.users
- * @param {string} user Username of user calling function
+ * @param {string} user Username for user requesting info
  */
 async function checkClaims(user) {
     rutil.mlog(`checking ${user}'s claims`);
@@ -132,7 +134,7 @@ async function checkClaims(user) {
  * users collection in the DB. If not, create an entry. This function
  * is not asynchronous because we need to verify user exists in DB
  * before doing any other operations
- * @param {string} user Username of user calling function
+ * @param {string} user Username for user requesting info
  */
 function checkUser(user) {
     const users = db.collection("users");
@@ -155,7 +157,7 @@ function checkUser(user) {
             });
             
         } else {
-            rutil.mlog (`User ${user} already in ${db.databaseName}`);
+            rutil.mlog (`[CheckUser] User ${user} already in ${db.databaseName}`);
         }
     });
 }
@@ -164,7 +166,7 @@ function checkUser(user) {
  * This monster allows the user executing this function to claim
  * the specified monster and add it into their collection. This will
  * update that user's entry in the users collection in the database.
- * @param {string} user Username of user calling function
+ * @param {string} user Username for user requesting info
  * @param {string} name Name of the monster to claim
  */
 async function claimMonster(user, name) {
@@ -175,12 +177,11 @@ async function claimMonster(user, name) {
  * This allows the user executing this function to claim the
  * specified monster by ID and add it into their collection. This will
  * update that user's entry in the users collection in the database.
- * @param {string} user Username of user calling function
+ * @param {string} user Username for user requesting info
  * @param {string} name Name of the monster to claim
  */
 function claimMonsterById(user, id) {
     const rolled = db.collection("rolled");
-    let output = 'init';
 
     // return a promise to search for desired monster in active rolled collection
     return rolled.findOne({"claimId": id.toString()}).then((result) => {
@@ -195,7 +196,6 @@ function claimMonsterById(user, id) {
 
             // remove monster from active collection
             rolled.deleteOne({"claimId": id.toString()});
-            rutil.mlog(`returning ${result.monName}`);
             return result.monName;
         }
     });
@@ -215,7 +215,7 @@ function printMonBox(user) {
 
 /**
  * Add Monster into a user's monster box (monBox) list in users collection.
- * @param {string} user 
+ * @param {string} user Username for user requesting info
  * @param {string} monName 
  */
 async function addMonsterToBoxById(user, monName) {
@@ -223,15 +223,36 @@ async function addMonsterToBoxById(user, monName) {
 
     // add specified monster to users's monster box
     await users.updateOne({"username": user}, {$addToSet: {monBox: monName.toString()}});
-    rutil.mlog(`{Successfully inserted ${monName} in ${user}'s monter box}`);
+    rutil.mlog(`Successfully inserted ${monName} in ${user}'s monter box`);
+}
+
+function getRollTimestamp(user) {
+    const users = db.collection("users");
+
+    // return lastRollTime field for specified user
+    return users.findOne({"username": user}).then((userEntry) => {
+        return userEntry.lastRollTime;
+    });
+}
+
+/**
+ * Add timestamp to user entry when they use their first roll.
+ * @param {string} user Username for user requesting info
+ */
+async function addRollTimestamp(user) {
+    const users = db.collection("users");
+
+    // add timestamp of user's first roll below max amount
+    await users.updateOne({"username": user}, {"$set": {"lastRollTime": new Date()}});
+    rutil.mlog(`Added timestamp`);
 }
 
 /**
  * Add a rolled mosnter to the active "rolled" buffer/collection. This
  * lets users have the oppurtunity to choose between rolls before
  * claiming a subset of them.
- * @param {string} name 
- * @param {string} url 
+ * @param {string} name Monster name
+ * @param {string} url Monster image URL
  */
 async function addRollToBuffer(name, url) {
     const rolled = db.collection("rolled");

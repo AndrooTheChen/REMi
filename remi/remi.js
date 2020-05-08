@@ -32,11 +32,13 @@ client.on('message', msg => {
     // It will listen for messages that will start with `%`
     if (msg.content.substring(0, 1) != '%') 
         return;
-    var args = msg.content.substring(1).split(' ');
-    var cmd = args[0];
+    let args = msg.content.substring(1).split(' ');
+    const cmd = args[0];
        
     // argument for some commands
     args = args.splice(1);
+
+    const user = msg.author.username;
 
     // commands:
     switch(cmd) {
@@ -53,11 +55,15 @@ client.on('message', msg => {
         // %roll
         case 'roll':
         case 'r':
-            mongoUser.checkUser(msg.author.username);
+            mongoUser.checkUser(user);
+
+            // add timestamp for the first roll
+            mongoUser.addRollTimestamp(user);
+
             roll = monster.rollMonster();
             mongoUser.addRollToBuffer(roll.name, roll.url).then((claimId) => {
-                rutil.log(`${msg.author.username} rolled ${roll.name} with active rolled ID ${claimId}`);
-                msg.channel.send(`**${msg.author.username}** rolled **${roll.name}**!`, {files:[roll.url]});
+                rutil.log(`${user} rolled ${roll.name} with active rolled ID ${claimId}`);
+                msg.channel.send(`**${user}** rolled **${roll.name}**!`, {files:[roll.url]});
 
                 setTimeout(() => {
                     msg.channel.send(`Claim ID is **${claimId}**, claim with:\n %claim ` + 
@@ -77,13 +83,13 @@ client.on('message', msg => {
         // %claimid <claimId>
         case 'claimid':
         case 'ci':
-            mongoUser.checkUser(msg.author.username);
-            mongoUser.claimMonsterById(msg.author.username, args).then((claimed) => {
+            mongoUser.checkUser(user);
+            mongoUser.claimMonsterById(user, args).then((claimed) => {
                 if (claimed.toString() == `FAILED`) {
                     msg.channel.send(`**__Error!__** ID ${args} is not a valid ID.`);
                 } else {
-                    msg.channel.send(`**${msg.author.username}** claimed **${claimed.toString()}**!`);
-                    rutil.log(`${msg.author.username} claimed ${claimed}`);
+                    msg.channel.send(`**${user}** claimed **${claimed.toString()}**!`);
+                    rutil.log(`${user} claimed ${claimed}`);
                 }
             });
         break;
@@ -91,9 +97,9 @@ client.on('message', msg => {
         case 'monbox':
         case 'mon':
         case 'mb':
-            mongoUser.checkUser(msg.author.username);
-            mongoUser.printMonBox(msg.author.username).then((monBox) => {
-                msg.channel.send(`**${msg.author.username}'s**`
+            mongoUser.checkUser(user);
+            mongoUser.printMonBox(user).then((monBox) => {
+                msg.channel.send(`**${user}'s**`
                 + ` monster box:\n${rutil.monPrint(monBox)}`);
             });
         break;
@@ -101,18 +107,18 @@ client.on('message', msg => {
         // %myrolls
         case 'myrolls':
         case 'mr':
-            mongoUser.checkUser(msg.author.username);
-            mongoUser.checkRolls(msg.author.username).then((rolls) => {
-                msg.channel.send(`**${msg.author.username}** you currently have ${rolls} rolls`);
+            mongoUser.checkUser(user);
+            mongoUser.checkRolls(user).then((rolls) => {
+                msg.channel.send(`**${user}** you currently have ${rolls} rolls`);
             });
         break;
 
         // %myclaims
         case 'myclaims':
         case 'mc':
-            mongoUser.checkUser(msg.author.username);
-            mongoUser.checkClaims(msg.author.username).then((claims) => {
-                msg.channel.send(`**${msg.author.username}** you currently have ${claims} claims`);
+            mongoUser.checkUser(user);
+            mongoUser.checkClaims(user).then((claims) => {
+                msg.channel.send(`**${user}** you currently have ${claims} claims`);
             });
         break;
 
@@ -121,7 +127,7 @@ client.on('message', msg => {
         // %test
         case 'test':
             rutil.log(`Testing checkUser`);
-            mongoUser.checkUser(msg.author.username);
+            mongoUser.checkUser(user);
             rutil.log(`userCheck finished`);
         break;
 
@@ -133,6 +139,18 @@ client.on('message', msg => {
 
         case `collections`:
             mongoUser.printCollections();
+        break;
+
+        // %time
+        case `time`:
+            const now = new Date();
+            mongoUser.getRollTimestamp(user).then((time) => {
+                rutil.log(`Time returned: ${time}`);
+                const diff = now - time;
+                rutil.log(`Time diff: ${diff}`);
+                msg.channel.send(`Time since last roll: ${rutil.printTimeStamp(diff)}`);
+            });
+            
         break;
 
         // DEBUG ========================================

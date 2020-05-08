@@ -1,12 +1,26 @@
 // rutil.js
 // =======
 module.exports = {
+    err,
+    log,
     monPrint,
     mlog,
-    log,
+    printTimeStamp,
     warn,
-    err,
 };
+
+/**
+ * Convert date into readable format.
+ * @param {Date} time 
+ */
+function printTimeStamp(time) {
+    const hh = Math.floor(time / 1000 / 60 / 60);
+    time -= hh * 1000 * 60 * 60;
+    const mm = Math.floor(time / 1000 / 60);
+    time -= mm * 1000 * 60;
+    const ss = Math.floor(time / 1000);
+    return `${hh}:${mm}:${ss}`;
+}
 
 /**
  * Get current time stamp.
