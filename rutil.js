@@ -1,6 +1,7 @@
 // rutil.js
 // =======
 module.exports = {
+    monPrint,
     mlog,
     log,
     warn,
@@ -16,6 +17,21 @@ function getTimeStamp() {
     const date = (today.getUTCMonth() +  1) + '/' + today.getUTCDay() + '/' + today.getFullYear();
     const time = today.getUTCHours() + ':' + today.getUTCMinutes() + ':' + today.getUTCSeconds();
     return `${date} ${time}`;
+}
+
+/**
+ * Build the string to print a user's monster box.
+ * @param {array} monBox List containing a user's monster box
+ */
+function monPrint(monBox) {
+    let str = `\`\`\`\n`;
+
+    monBox.forEach((monster) => {
+        str = str + `${monster}\n`;
+    })
+
+    str = str + `\`\`\``;
+    return str;
 }
 
 /**

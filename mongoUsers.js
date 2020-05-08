@@ -20,6 +20,7 @@ module.exports = {
     claimMonsterById,
     connectDB,
     addRollToBuffer,
+    printMonBox,
     printUsers,
     printRolled,
     printCollections,
@@ -197,6 +198,18 @@ function claimMonsterById(user, id) {
             rutil.mlog(`returning ${result.monName}`);
             return result.monName;
         }
+    });
+}
+
+/**
+ * Send back a user's claimed monsters, their monster box.
+ * @param {string} user Username for user requesting info
+ */
+function printMonBox(user) {
+    const users = db.collection("users");
+
+    return users.findOne({"username": user}).then((userEntry) => {
+        return userEntry.monBox;
     });
 }
 

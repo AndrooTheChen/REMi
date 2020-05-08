@@ -74,7 +74,7 @@ client.on('message', msg => {
             
         break;
 
-        // %claimid <claimId
+        // %claimid <claimId>
         case 'claimid':
         case 'ci':
             mongoUser.checkUser(msg.author.username);
@@ -85,6 +85,16 @@ client.on('message', msg => {
                     msg.channel.send(`**${msg.author.username}** claimed **${claimed.toString()}**!`);
                     rutil.log(`${msg.author.username} claimed ${claimed}`);
                 }
+            });
+        break;
+
+        case 'monbox':
+        case 'mon':
+        case 'mb':
+            mongoUser.checkUser(msg.author.username);
+            mongoUser.printMonBox(msg.author.username).then((monBox) => {
+                msg.channel.send(`**${msg.author.username}'s**`
+                + ` monster box:\n${rutil.monPrint(monBox)}`);
             });
         break;
 
