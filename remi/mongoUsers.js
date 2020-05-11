@@ -13,6 +13,7 @@ module.export = {"mongo_client": mongo_client};
 let claimId = 0;
 
 module.exports = {
+    addClaimTimestamp,
     addRollTimestamp,
     addRollToBuffer,
     checkUser,
@@ -21,11 +22,14 @@ module.exports = {
     claimMonster,
     claimMonsterById,
     connectDB,
+    getClaimTimestamp,
     getRollTimestamp,
     printCollections,
     printMonBox,
     printRolled,
     printUsers,
+    setClaims,
+    setRolls,
     "mongo_client" : mongo_client,
 }
 
@@ -111,11 +115,17 @@ async function checkRolls(user) {
     rutil.mlog(`finished checking rolls`);
 }
 
+function setRolls(user, numRolls) {
+    rutil.log(`Setting ${user}'s number of rolls to ${numRolls}`);
+    const users = db.collection("users");
+    return users.updateOne({"username": user}, {$set: {"numRolls": numRolls}});
+}
+
 /**
  * Allow the user to check how many claims they currently
  * have. This function simply queries the numClaims field in
  * remiDB.users
- * @param {string} user Username for user requesting info
+ * @param {string} user Username for user requesting info.
  */
 async function checkClaims(user) {
     rutil.mlog(`checking ${user}'s claims`);
@@ -130,6 +140,32 @@ async function checkClaims(user) {
 }
 
 /**
+ * Set the user's number of claims to the specified amount.
+ * @param {string} user Username for user requesting info.
+ * @param {int} numClaims Number of claims to set for the user.
+ */
+function setClaims(user, numClaims) {
+    rutil.log(`Setting ${user}'s claims to ${numClaims}`);
+    const users = db.collection("users");
+    return users.updateOne({"username": user}, {$set: {"numClaims" : numClaims}});
+}
+
+/**
+ * Computes time differential between given time and right now
+ * to see if forty five minutes or more have passed.
+ * @param {Date} time given UTC time 
+ * @return {bool} true if 45 minutes have passed, false otherwise
+ */
+function timeToReset(time) {
+    const now = new Date();
+    let diff = now - time;
+    const hh = Math.floor(diff / 1000 / 60 / 60);
+    diff -= hh * 1000 * 60 * 60;
+    const mm = Math.floor(diff / 1000 / 60);
+    return (hh > 1 || mm >= 45) ? true : false;
+}
+
+/**
  * Check if the user executing a cmd already exists in the
  * users collection in the DB. If not, create an entry. This function
  * is not asynchronous because we need to verify user exists in DB
@@ -138,6 +174,7 @@ async function checkClaims(user) {
  */
 function checkUser(user) {
     const users = db.collection("users");
+    const now = new Date();
 
     // verify user exists in collection
     users.findOne({"username":user}, function(err, result){
@@ -158,6 +195,22 @@ function checkUser(user) {
             
         } else {
             rutil.mlog (`[CheckUser] User ${user} already in ${db.databaseName}`);
+        }
+    });
+
+    // reset user rolls to 10 after 45 minutes after their first roll
+    getRollTimestamp(user).then((firstRollTime) => {
+        if (timeToReset(firstRollTime) == true) {
+            setRolls(user, 10);
+            rutil.mlog(`Resetting ${user}'s rolls to 10`);
+        }
+    });
+
+    // reset user claims to 3 after 45 minutes after their first claim
+    getClaimTimestamp(user).then((firstClaimTime) => {
+        if (timeToReset(firstClaimTime) == true) {
+            setClaims(user, 3);
+            rutil.mlog(`Resetting ${user}'s claims to 3`);
         }
     });
 }
@@ -226,12 +279,26 @@ async function addMonsterToBoxById(user, monName) {
     rutil.mlog(`Successfully inserted ${monName} in ${user}'s monter box`);
 }
 
-function getRollTimestamp(user) {
+/**
+ * Add timestamp to user when they use their first claim
+ * @param {string} user 
+ */
+async function addClaimTimestamp(user) {
     const users = db.collection("users");
 
-    // return lastRollTime field for specified user
+    await users.updateOne({"username": user}, {$set: {"lastClaimTime": new Date()}});
+}
+
+/**
+ * Get the timestamp from when the user used their first claim.
+ * @param {string} user Username for user requesting info
+ */
+function getClaimTimestamp(user) {
+    const users = db.collection("users");
+
+    // return lastClaimTime field for specified user
     return users.findOne({"username": user}).then((userEntry) => {
-        return userEntry.lastRollTime;
+        return userEntry.lastClaimTime;
     });
 }
 
@@ -244,7 +311,19 @@ async function addRollTimestamp(user) {
 
     // add timestamp of user's first roll below max amount
     await users.updateOne({"username": user}, {"$set": {"lastRollTime": new Date()}});
-    rutil.mlog(`Added timestamp`);
+}
+
+/**
+ * Get the timestamp from when the user used their first roll.
+ * @param {string} user Username for user requesting info
+ */
+function getRollTimestamp(user) {
+    const users = db.collection("users");
+
+    // return lastRollTime field for specified user
+    return users.findOne({"username": user}).then((userEntry) => {
+        return userEntry.lastRollTime;
+    });
 }
 
 /**
@@ -262,7 +341,6 @@ async function addRollToBuffer(name, url) {
         "monName": name,
         "monUrl": url,
         "rollTime": currTime,
-        "isClaimed": false,
     })
     rutil.mlog(`${name} successfully added to rolled buffer with ID ${claimId}`);
     
