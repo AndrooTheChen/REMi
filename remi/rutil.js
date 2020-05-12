@@ -19,7 +19,7 @@ function printTimeStamp(time) {
     const mm = Math.floor(time / 1000 / 60);
     time -= mm * 1000 * 60;
     const ss = Math.floor(time / 1000);
-    return `${hh}:${mm}:${ss}`;
+    return `**${hh}** hrs **${mm}** min **${ss}** sec`;
 }
 
 /**

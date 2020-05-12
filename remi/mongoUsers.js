@@ -174,7 +174,6 @@ function timeToReset(time) {
  */
 function checkUser(user) {
     const users = db.collection("users");
-    const now = new Date();
 
     // verify user exists in collection
     users.findOne({"username":user}, function(err, result){
@@ -195,22 +194,22 @@ function checkUser(user) {
             
         } else {
             rutil.mlog (`[CheckUser] User ${user} already in ${db.databaseName}`);
-        }
-    });
+            
+            // reset user rolls to 10 after 45 minutes after their first roll
+            getRollTimestamp(user).then((firstRollTime) => {
+                if (timeToReset(firstRollTime) == true) {
+                    setRolls(user, 10);
+                    rutil.mlog(`Resetting ${user}'s rolls to 10`);
+                }
+            });
 
-    // reset user rolls to 10 after 45 minutes after their first roll
-    getRollTimestamp(user).then((firstRollTime) => {
-        if (timeToReset(firstRollTime) == true) {
-            setRolls(user, 10);
-            rutil.mlog(`Resetting ${user}'s rolls to 10`);
-        }
-    });
-
-    // reset user claims to 3 after 45 minutes after their first claim
-    getClaimTimestamp(user).then((firstClaimTime) => {
-        if (timeToReset(firstClaimTime) == true) {
-            setClaims(user, 3);
-            rutil.mlog(`Resetting ${user}'s claims to 3`);
+            // reset user claims to 3 after 45 minutes after their first claim
+            getClaimTimestamp(user).then((firstClaimTime) => {
+                if (timeToReset(firstClaimTime) == true) {
+                    setClaims(user, 3);
+                    rutil.mlog(`Resetting ${user}'s claims to 3`);
+                }
+            });
         }
     });
 }
