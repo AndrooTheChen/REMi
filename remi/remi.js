@@ -55,7 +55,8 @@ client.on('message', msg => {
             msg.channel.send(`**%roll** - roll for a monster!\n` + 
                             `**%help** - list commands\n` +
                             `**%claimid** ***<ID>*** - claim a monster by ID\n` + 
-                            `**%monbox** - print your monster box\n`);
+                            `**%monbox** - print your monster box\n` +
+                            `**%myrolls** - print your rolls\n`);
         break;
 
         // %roll
