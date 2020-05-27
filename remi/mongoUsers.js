@@ -88,7 +88,7 @@ async function connectDB() {
         // make sure rolled buffer is clear on startup
         await db.collection("rolled").deleteMany();
 
-        // await db.collection("users").deleteMany();
+        //await db.collection("users").deleteMany();
 
         return `success`;
     } catch (ex) {
@@ -172,11 +172,11 @@ function timeToReset(time) {
  * before doing any other operations
  * @param {string} user Username for user requesting info
  */
-function checkUser(user) {
+async function checkUser(user) {
     const users = db.collection("users");
 
     // verify user exists in collection
-    users.findOne({"username":user}, function(err, result){
+    return users.findOne({"username":user}).then((err, result) => {
         if (err || result == null) {
             // add new user to collection
             rutil.mlog(`${user} is not yet registered.`);
@@ -190,13 +190,14 @@ function checkUser(user) {
                 "monBox": [],
             }).then((result) => {
                 rutil.mlog(`Sucessfully inserted ${result} entry for ${user}`);
+                return;
             });
             
         } else {
             rutil.mlog (`[CheckUser] User ${user} already in ${db.databaseName}`);
             
             // reset user rolls to 10 after 45 minutes after their first roll
-            getRollTimestamp(user).then((firstRollTime) => {
+            const rollPromise = getRollTimestamp(user).then((firstRollTime) => {
                 if (timeToReset(firstRollTime) == true) {
                     setRolls(user, 10);
                     rutil.mlog(`Resetting ${user}'s rolls to 10`);
@@ -204,11 +205,16 @@ function checkUser(user) {
             });
 
             // reset user claims to 3 after 45 minutes after their first claim
-            getClaimTimestamp(user).then((firstClaimTime) => {
+            const claimPromise = getClaimTimestamp(user).then((firstClaimTime) => {
                 if (timeToReset(firstClaimTime) == true) {
                     setClaims(user, 3);
                     rutil.mlog(`Resetting ${user}'s claims to 3`);
                 }
+            });
+
+            return Promise.all([rollPromise, claimPromise]).then(() => {
+                rutil.mlog("Returning from checkUser()");
+                return;
             });
         }
     });
