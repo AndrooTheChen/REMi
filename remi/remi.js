@@ -5,8 +5,9 @@ const client = new Discord.Client();
 const auth = require('./auth.json');
 const mongoUser = require('./mongoUsers');
 const rutil = require ('./rutil');
-const monster = require('./monster');
 const cmds = require('./commands');
+
+let user;
 
 // connect to database
 mongoUser.connectDB().then((status) => {
@@ -25,6 +26,13 @@ client.on('ready', () => {
     rutil.log(`Logged in as ${client.user.tag}!`);
 });
 
+client.on('messageReactionAdd', (reaction, user) => {
+    // let bot = react.client.user.bot;
+    const react = reaction.emoji;
+    rutil.log(`User ${user.username} reacted with ${react}`);
+    rutil.log(`Message reacted to: ${reaction.message.content}`)
+});
+
 /**
  * Reply to all commands, this is an event listener.
  */
@@ -39,7 +47,7 @@ client.on('message', msg => {
     // argument for some commands
     args = args.splice(1);
 
-    const user = msg.author.username;
+    user = msg.author.username;
 
     // commands:
     mongoUser.checkUser(user).then(() => {
