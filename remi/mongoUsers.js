@@ -184,8 +184,8 @@ function checkUser(user) {
                 "username": user,
                 "numRolls": 10,
                 "numClaims": 3,
-                "lastRollTime": "",
-                "lastClaimTime": "",
+                "firstRollTime": "",
+                "firstClaimTime": "",
                 "monPts": 0,
                 "monBox": [],
             }).then((result) => {
@@ -285,7 +285,7 @@ async function addMonsterToBoxById(user, monName) {
 async function addClaimTimestamp(user) {
     const users = db.collection("users");
 
-    await users.updateOne({"username": user}, {$set: {"lastClaimTime": new Date()}});
+    await users.updateOne({"username": user}, {$set: {"firstClaimTime": new Date()}});
 }
 
 /**
@@ -295,9 +295,9 @@ async function addClaimTimestamp(user) {
 function getClaimTimestamp(user) {
     const users = db.collection("users");
 
-    // return lastClaimTime field for specified user
+    // return firstClaimTime field for specified user
     return users.findOne({"username": user}).then((userEntry) => {
-        return userEntry.lastClaimTime;
+        return userEntry.firstClaimTime;
     });
 }
 
@@ -309,7 +309,7 @@ async function addRollTimestamp(user) {
     const users = db.collection("users");
 
     // add timestamp of user's first roll below max amount
-    await users.updateOne({"username": user}, {"$set": {"lastRollTime": new Date()}});
+    await users.updateOne({"username": user}, {"$set": {"firstRollTime": new Date()}});
 }
 
 /**
@@ -319,9 +319,9 @@ async function addRollTimestamp(user) {
 function getRollTimestamp(user) {
     const users = db.collection("users");
 
-    // return lastRollTime field for specified user
+    // return firstRollTime field for specified user
     return users.findOne({"username": user}).then((userEntry) => {
-        return userEntry.lastRollTime;
+        return userEntry.firstRollTime;
     });
 }
 
