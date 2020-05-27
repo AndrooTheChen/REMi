@@ -1,5 +1,21 @@
 // rutil.js
 // =======
+const hearts = new Set([`%E2%9D%A4%EF%B8%8F` /* :heart: */, 
+                        `%E2%9D%A4%EF%B8%8F` /* :hearts: */,
+                        `%F0%9F%96%A4` /* :black_heart: */,
+                        `%F0%9F%92%99` /* :blue_heart: */,
+                        `%F0%9F%A4%8E` /* :brown_heart: */,
+                        `%F0%9F%92%9A` /* :green_heart: */,
+                        `%F0%9F%A7%A1` /* :orange_heart: */,
+                        `%F0%9F%92%9C` /* :purple_heart: */,
+                        `%F0%9F%92%9E` /* :revolving_heart: */,
+                        `%F0%9F%92%96` /* :sparkling_heart: */,
+                        `%F0%9F%92%95` /* :two_hearts: */,
+                        `%F0%9F%A4%8D` /* :white_heart: */,
+                        `%F0%9F%92%9B` /* :yellow_heart: */,
+                        `%F0%9F%92%93` /* :heartbeat: */,
+                        `%F0%9F%92%97` /* :heartpulse: */,]);
+
 module.exports = {
     err,
     log,
@@ -7,6 +23,7 @@ module.exports = {
     mlog,
     printTimeStamp,
     warn,
+    "hearts": hearts,
 };
 
 /**

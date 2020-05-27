@@ -1,6 +1,7 @@
 // remij.s
 // =======
 const Discord = require('discord.js');
+const {MessageEmbed} = require('discord.js')
 const client = new Discord.Client();
 const auth = require('./auth.json');
 const mongoUser = require('./mongoUsers');
@@ -27,10 +28,11 @@ client.on('ready', () => {
 });
 
 client.on('messageReactionAdd', (reaction, user) => {
-    // let bot = react.client.user.bot;
     const react = reaction.emoji;
+    if (rutil.hearts.has(react.identifier)) rutil.log(`HEARTED REACTION`);
+    rutil.log(`Reaction type: ${react.identifier}`);
     rutil.log(`User ${user.username} reacted with ${react}`);
-    rutil.log(`Message reacted to: ${reaction.message.content}`)
+    rutil.log(`Message reacted to: ${reaction.message.embeds[0].title} with attributes ${Object.getOwnPropertyNames(reaction.message.embeds)}`)
 });
 
 /**
@@ -151,6 +153,16 @@ client.on('message', msg => {
             case `rc`:
                 rutil.warn(`Resetting ${user} to 3 claims`)
                 mongoUser.setClaims(user, 3);
+            break;
+
+            // %msg
+            case `msg`:
+                const embed = new MessageEmbed()
+                .setTitle('Artemis')
+                .setColor(0xff0000)
+                .setDescription('uwu kawaiiiii')
+                .setImage('http://puzzledragonx.com/en/img/monster/MONS_571.jpg');
+                msg.channel.send(embed);
             break;
     
             // DEBUG ========================================
