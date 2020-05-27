@@ -6,6 +6,7 @@ const auth = require('./auth.json');
 const mongoUser = require('./mongoUsers');
 const rutil = require ('./rutil');
 const monster = require('./monster');
+const cmds = require('./commands');
 
 // connect to database
 mongoUser.connectDB().then((status) => {
@@ -45,6 +46,7 @@ client.on('message', msg => {
 
     // commands:
     mongoUser.checkUser(user).then(() => {
+        rutil.log(`${user} ran cmd: ${cmd}`);
         switch(cmd) {
             // %ping
             case 'ping':
@@ -53,18 +55,12 @@ client.on('message', msg => {
     
             // %help
             case 'help':
-                msg.channel.send(`**%roll** - roll for a monster!\n` + 
-                                `**%help** - list commands\n` +
-                                `**%claimid** ***<ID>*** - claim a monster by ID\n` + 
-                                `**%monbox** - print your monster box\n` +
-                                `**%myrolls** - print your rolls\n`);
+                cmds.help(msg);
             break;
     
             // %roll
             case 'roll':
             case 'r':
-                // mongoUser.checkUser(user);
-    
                 mongoUser.checkRolls(user).then((numRolls) => {
                     if (numRolls == 0) {
                         msg.channel.send(`${user} has no rolls left!`);
@@ -158,10 +154,11 @@ client.on('message', msg => {
                 mongoUser.checkRolls(user).then((rolls) => {
                     msg.channel.send(`**${user}** you currently have **${rolls}** rolls`);
                     if (rolls == 0) {
-                        mongoUser.getClaimTimestamp(user).then((rollTime) => {
-                            ffLater = new Date(rollTime.getTime() + 45 *60000);
-                            timeDiff = ffLater - reset;
-                            msg.channel.send(`Wait ${rutil.printTimeStamp(timeDiff)} for claims to refresh.`);
+                        now = new Date();
+                        mongoUser.getRollTimestamp(user).then((rollTime) => {
+                            ffLater = new Date(rollTime.getTime() + 45 * 60000);
+                            timeDiff = ffLater - now;
+                            msg.channel.send(`Wait ${rutil.printTimeStamp(timeDiff)} for rolls to refresh.`);
                         });
                     }
                 });
@@ -173,6 +170,14 @@ client.on('message', msg => {
                 // mongoUser.checkUser(user);
                 mongoUser.checkClaims(user).then((claims) => {
                     msg.channel.send(`**${user}** you currently have **${claims}** claims`);
+                    if (claims == 0) {
+                        now = new Date();
+                        mongoUser.getClaimTimestamp(user).then((claimTime) => {
+                            ffLater = new Date(claimTime.getTime() + 45 * 60000);
+                            timeDiff = ffLater - now;
+                            msg.channel.send(`Wait ${rutil.printTimeStamp(timeDiff)} for claims to refresh.`)
+                        });
+                    }
                 });
             break;
     
@@ -197,7 +202,7 @@ client.on('message', msg => {
     
             // %time
             case `time`:
-                const now = new Date();
+                now = new Date();
                 mongoUser.getRollTimestamp(user).then((time) => {
                     rutil.log(`Time returned: ${time}`);
                     const diff = now - time;

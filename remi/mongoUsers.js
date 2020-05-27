@@ -31,7 +31,7 @@ module.exports = {
     setClaims,
     setRolls,
     "mongo_client" : mongo_client,
-}
+};
 
 /**
  * DEBUG
@@ -116,7 +116,7 @@ async function checkRolls(user) {
 }
 
 function setRolls(user, numRolls) {
-    rutil.log(`Setting ${user}'s number of rolls to ${numRolls}`);
+    rutil.mlog(`Setting ${user}'s number of rolls to ${numRolls}`);
     const users = db.collection("users");
     return users.updateOne({"username": user}, {$set: {"numRolls": numRolls}});
 }
@@ -145,7 +145,7 @@ async function checkClaims(user) {
  * @param {int} numClaims Number of claims to set for the user.
  */
 function setClaims(user, numClaims) {
-    rutil.log(`Setting ${user}'s claims to ${numClaims}`);
+    rutil.mlog(`Setting ${user}'s claims to ${numClaims}`);
     const users = db.collection("users");
     return users.updateOne({"username": user}, {$set: {"numClaims" : numClaims}});
 }
@@ -176,8 +176,8 @@ async function checkUser(user) {
     const users = db.collection("users");
 
     // verify user exists in collection
-    return users.findOne({"username":user}).then((err, result) => {
-        if (err || result == null) {
+    return users.findOne({"username":user}).then((result) => {
+        if (result == null) {
             // add new user to collection
             rutil.mlog(`${user} is not yet registered.`);
             users.insertOne({
@@ -189,7 +189,7 @@ async function checkUser(user) {
                 "monPts": 0,
                 "monBox": [],
             }).then((result) => {
-                rutil.mlog(`Sucessfully inserted ${result} entry for ${user}`);
+                rutil.mlog(`Successfully inserted ${result} entry for ${user}`);
                 return;
             });
             
