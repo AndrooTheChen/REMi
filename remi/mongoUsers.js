@@ -30,7 +30,7 @@ module.exports = {
     printUsers,
     setClaims,
     setRolls,
-    "mongo_client" : mongo_client,
+    "mongo_client": mongo_client,
 };
 
 /**

@@ -3,6 +3,7 @@
 const mongoUser = require('./mongoUsers');
 const monster = require('./monster');
 const rutil = require(`./rutil`);
+const {MessageEmbed} = require('discord.js')
 
 module.exports = {
     claimid,
@@ -17,6 +18,10 @@ module.exports = {
 let ffLater;
 let timeDiff;
 let now;
+
+// Local variables for embedding messages
+let embed;
+let randomColour;
 
 /**
  * Print the available REMi commands to user in Discord.
@@ -43,7 +48,7 @@ function help(msg) {
 function roll(user, msg) {
     mongoUser.checkRolls(user).then((numRolls) => {
         if (numRolls == 0) {
-            msg.channel.send(`${user} has no rolls left!`);
+            msg.channel.send(`**${user}** has no rolls left!`);
             const roll_now = new Date();
             mongoUser.getRollTimestamp(user).then((rollTime) => {
                 ffLater = new Date(rollTime.getTime() + 45 *60000);
@@ -59,15 +64,17 @@ function roll(user, msg) {
             roll = monster.rollMonster();
             mongoUser.addRollToBuffer(roll.name, roll.url).then((claimId) => {
                 rutil.log(`${user} rolled ${roll.name} with active rolled ID ${claimId}`);
-                msg.channel.send(`**${user}** rolled **${roll.name}**!`, {files:[roll.url]});
 
-                setTimeout(() => {
-                    msg.channel.send(`Claim ID is **${claimId}**, claim with:\n ~~%claim ` + 
-                    `**${roll.name}**~~(WIP)\nor\n%claimid **${claimId}**`)
-                }, 400);
+                randomColour = Math.floor(Math.random()*16777215).toString(16);
+                embed = new MessageEmbed()
+                .setTitle(roll.name)
+                .setColor(randomColour)
+                .setDescription(`Claim with :heart:`)
+                .setImage(roll.url)
+                .setFooter(`${user} has ${numRolls-1} roll(s) remaining.`);
+                msg.channel.send(embed);
 
                 mongoUser.setRolls(user, numRolls-1);
-                msg.channel.send(`${user} you have **${numRolls-1}** roll(s) remaining.`)
             });
         }
     });

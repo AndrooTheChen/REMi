@@ -27,12 +27,19 @@ client.on('ready', () => {
     rutil.log(`Logged in as ${client.user.tag}!`);
 });
 
+/**
+ * Look out for heart reacts for if users want to claim a monster
+ */
 client.on('messageReactionAdd', (reaction, user) => {
     const react = reaction.emoji;
-    if (rutil.hearts.has(react.identifier)) rutil.log(`HEARTED REACTION`);
-    rutil.log(`Reaction type: ${react.identifier}`);
+
+    // Ignore if message doesn't contain any embeds or reaaction isn't heart
+    // since only embedded messages should be interactable and only hearts do stuff.
+    if (!reaction.message.embeds.length || !rutil.hearts.has(react.identifier)) return;
+
     rutil.log(`User ${user.username} reacted with ${react}`);
-    rutil.log(`Message reacted to: ${reaction.message.embeds[0].title} with attributes ${Object.getOwnPropertyNames(reaction.message.embeds)}`)
+    rutil.log(`Message has ${reaction.message.embeds.length} embeds`);
+    //rutil.log(`Message reacted to: ${reaction.message.embeds[0].title} with attributes ${Object.getOwnPropertyNames(reaction.message.embeds)}`)
 });
 
 /**
@@ -157,9 +164,10 @@ client.on('message', msg => {
 
             // %msg
             case `msg`:
+                const randomColor = Math.floor(Math.random()*16777215).toString(16);
                 const embed = new MessageEmbed()
                 .setTitle('Artemis')
-                .setColor(0xff0000)
+                .setColor(randomColor)
                 .setDescription('uwu kawaiiiii')
                 .setImage('http://puzzledragonx.com/en/img/monster/MONS_571.jpg');
                 msg.channel.send(embed);
