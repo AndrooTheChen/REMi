@@ -28,18 +28,16 @@ client.on('ready', () => {
 });
 
 /**
- * Look out for heart reacts for if users want to claim a monster
+ * Claim a monster with heart reactions. Exit function immediately if message 
+ * doesn't contain any embeds or read reaction isn't a type of heart. This is
+ * because only embedded messages should be interactable and only hearts 
+ * reactions can be used to claim monsters.
  */
 client.on('messageReactionAdd', (reaction, user) => {
-    const react = reaction.emoji;
+    if (!reaction.message.embeds.length || !rutil.hearts.has(reaction.emoji.identifier)) return;
 
-    // Ignore if message doesn't contain any embeds or reaaction isn't heart
-    // since only embedded messages should be interactable and only hearts do stuff.
-    if (!reaction.message.embeds.length || !rutil.hearts.has(react.identifier)) return;
-
-    rutil.log(`User ${user.username} reacted with ${react}`);
-    rutil.log(`Message has ${reaction.message.embeds.length} embeds`);
-    //rutil.log(`Message reacted to: ${reaction.message.embeds[0].title} with attributes ${Object.getOwnPropertyNames(reaction.message.embeds)}`)
+    rutil.log(`User ${user.username} claiming ${reaction.message.embeds[0].title}`);
+    cmds.claim(user.username, reaction.message.embeds[0].title, reaction.message);
 });
 
 /**

@@ -17,6 +17,7 @@ const hearts = new Set([`%E2%9D%A4%EF%B8%8F` /* :heart: */,
                         `%F0%9F%92%97` /* :heartpulse: */,]);
 
 module.exports = {
+    clog,
     err,
     log,
     monPrint,
@@ -70,12 +71,21 @@ function monPrint(monBox) {
  * @param {string} msg Message to be logged
  */
 function log(msg) {
-    console.log(`[${getTimeStamp()} LOGGING] ${msg}`);
+    console.log(`[${getTimeStamp()} REMi main LOGGING] ${msg}`);
+}
+
+/**
+ * Log the given message with a time stamp to the console. This 
+ * is used to log commands.
+ * @param {string} msg Message to be logged
+ */
+function clog(msg) {
+    console.log(`[${getTimeStamp()} CMD LOGGING] ${msg}`);
 }
 
 /**
  * Log the given message with a time stamp to the console. This
- * is used for MDB transactions
+ * is used for MDB transactions.
  * @param {string} msg Message to be logged
  */
 function mlog(msg) {

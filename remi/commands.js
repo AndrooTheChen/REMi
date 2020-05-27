@@ -1,11 +1,13 @@
 // commands.js
 // ===========
+const Discord = require('discord.js');
 const mongoUser = require('./mongoUsers');
 const monster = require('./monster');
 const rutil = require(`./rutil`);
 const {MessageEmbed} = require('discord.js')
 
 module.exports = {
+    claim,
     claimid,
     help,
     monbox,
@@ -48,6 +50,7 @@ function help(msg) {
 function roll(user, msg) {
     mongoUser.checkRolls(user).then((numRolls) => {
         if (numRolls == 0) {
+            // print how long user has to wait before rolling again
             msg.channel.send(`**${user}** has no rolls left!`);
             const roll_now = new Date();
             mongoUser.getRollTimestamp(user).then((rollTime) => {
@@ -63,8 +66,9 @@ function roll(user, msg) {
 
             roll = monster.rollMonster();
             mongoUser.addRollToBuffer(roll.name, roll.url).then((claimId) => {
-                rutil.log(`${user} rolled ${roll.name} with active rolled ID ${claimId}`);
+                rutil.clog(`${user} rolled ${roll.name} with active rolled ID ${claimId}`);
 
+                // create embed message to display roll to chat
                 randomColour = Math.floor(Math.random()*16777215).toString(16);
                 embed = new MessageEmbed()
                 .setTitle(roll.name)
@@ -74,7 +78,50 @@ function roll(user, msg) {
                 .setFooter(`${user} has ${numRolls-1} roll(s) remaining.`);
                 msg.channel.send(embed);
 
+                // decrement number of rolls user has left
                 mongoUser.setRolls(user, numRolls-1);
+            });
+        }
+    });
+}
+
+/**
+ * Allow a user to claim a rolled monster and put it in their monster box. Check
+ * That the user has enough claims first and also that the given name
+ * is valid.
+ * @param {string} user Username for user requesting info.
+ * @param {parameter} args Name for a rolled monster.
+ * @param {parameter} msg User command and argument(s).
+ */
+function claim(user, args, msg) {
+    mongoUser.checkClaims(user).then((numClaims) => {
+        // check if user has enough claims
+        if (numClaims == 0) {
+            msg.channel.send(`**${user}** has no claims left!`);
+            const claim_now = new Date();
+            mongoUser.getClaimTimestamp(user).then((claimTime) => {
+                ffLater = new Date(claimTime.getTime() + 45 *60000);
+                timeDiff = (ffLater > claim_now) ? ffLater - claim_now : 0;
+                msg.channel.send(`Need to wait ${rutil.printTimeStamp(timeDiff)} for claims to reset`);
+            });
+        } else {
+            if (numClaims == 3) {
+                // record the time for the user's first claim
+                mongoUser.addClaimTimestamp(user);
+            }
+
+            rutil.clog(`User has enough claims`);
+            mongoUser.claimMonster(user, args).then((claimed) => {
+                if (claimed.toString() == `FAILED`) {
+                    msg.channel.send(`**__Error!__** name ${args} is not a valid name.`);
+                } else {
+                    msg.channel.send(`**${user}** claimed **${claimed.toString()}**!` +
+                                        `\nyou have **${numClaims-1}** claim(s) remaining.`);
+                    rutil.clog(`${user} claimed ${claimed}`);
+                }
+
+                // update user's remaining claims
+                mongoUser.setClaims(user, numClaims-1);
             });
         }
     });
@@ -105,14 +152,14 @@ function claimid(user, args, msg) {
                 mongoUser.addClaimTimestamp(user);
             }
 
-            console.log(`User has enough claims`);
+            rutil.clog(`User has enough claims`);
             mongoUser.claimMonsterById(user, args).then((claimed) => {
                 if (claimed.toString() == `FAILED`) {
                     msg.channel.send(`**__Error!__** ID ${args} is not a valid ID.`);
                 } else {
                     msg.channel.send(`**${user}** claimed **${claimed.toString()}**!` +
                                         `\nyou have **${numClaims-1}** claim(s) remaining.`);
-                    rutil.log(`${user} claimed ${claimed}`);
+                    rutil.clog(`${user} claimed ${claimed}`);
                 }
 
                 // update user's remaining claims

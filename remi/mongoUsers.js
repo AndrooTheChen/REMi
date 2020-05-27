@@ -227,8 +227,25 @@ async function checkUser(user) {
  * @param {string} user Username for user requesting info
  * @param {string} name Name of the monster to claim
  */
-async function claimMonster(user, name) {
+function claimMonster(user, name) {
+    const rolled = db.collection("rolled");
 
+    // return a promise to search for desired monster in active rolled collection
+    return rolled.findOne({"monName": name}).then((result) => {
+        if (result == null) {
+            // error, user tried to claim invalid ID
+            rutil.err(`${name} not found in 'rolled' collection`);
+            rutil.mlog(`returning FAILED`);
+            return `FAILED`;
+        } else {
+            // add monster to user's monster box in user collection
+            addMonsterToBoxById(user, result.monName);
+
+            // remove monster from active collection
+            rolled.deleteOne({"claimId": name});
+            return result.monName;
+        }
+    });
 }
 
 /**
