@@ -65,7 +65,7 @@ function roll(user, msg) {
             }
 
             roll = monster.rollMonster();
-            mongoUser.addRollToBuffer(roll.name, roll.url).then((claimId) => {
+            mongoUser.addRollToBuffer(user, roll.name, roll.url).then((claimId) => {
                 rutil.clog(`${user} rolled ${roll.name} with active rolled ID ${claimId}`);
 
                 // create embed message to display roll to chat
@@ -100,7 +100,7 @@ function claim(user, args, msg) {
             msg.channel.send(`**${user}** has no claims left!`);
             const claim_now = new Date();
             mongoUser.getClaimTimestamp(user).then((claimTime) => {
-                ffLater = new Date(claimTime.getTime() + 45 *60000);
+                ffLater = new Date(claimTime.getTime() + (45 * 60000));
                 timeDiff = (ffLater > claim_now) ? ffLater - claim_now : 0;
                 msg.channel.send(`Need to wait ${rutil.printTimeStamp(timeDiff)} for claims to reset`);
             });
@@ -113,12 +113,12 @@ function claim(user, args, msg) {
             rutil.clog(`User has enough claims`);
             mongoUser.claimMonster(user, args).then((claimed) => {
                 if (claimed.toString() == `FAILED`) {
-                    msg.channel.send(`**__Error!__** name ${args} is not a valid name.`);
-                } else {
-                    msg.channel.send(`**${user}** claimed **${claimed.toString()}**!` +
-                                        `\nyou have **${numClaims-1}** claim(s) remaining.`);
-                    rutil.clog(`${user} claimed ${claimed}`);
+                    rutil.mlog(`CLAIM ERROR! ${args} not found in 'rolled' buffer.`);
+                    return;
                 }
+                msg.channel.send(`**${user}** claimed **${claimed.toString()}**!` +
+                                    `\nyou have **${numClaims-1}** claim(s) remaining.`);
+                rutil.clog(`${user} claimed ${claimed}`);
 
                 // update user's remaining claims
                 mongoUser.setClaims(user, numClaims-1);

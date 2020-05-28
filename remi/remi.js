@@ -107,6 +107,8 @@ client.on('message', msg => {
             break;
     
             // DEBUG ========================================
+            // These commands will be removed or switched to an Admin-only
+            // role in the future.
     
             // %test
             case 'test':

@@ -242,7 +242,7 @@ function claimMonster(user, name) {
             addMonsterToBoxById(user, result.monName);
 
             // remove monster from active collection
-            rolled.deleteOne({"claimId": name});
+            removeRollFromBuffer(user, name);
             return result.monName;
         }
     });
@@ -298,7 +298,7 @@ async function addMonsterToBoxById(user, monName) {
 
     // add specified monster to users's monster box
     await users.updateOne({"username": user}, {$addToSet: {monBox: monName.toString()}});
-    rutil.mlog(`Successfully inserted ${monName} in ${user}'s monter box`);
+    rutil.mlog(`Successfully inserted ${monName} in ${user}'s monster box`);
 }
 
 /**
@@ -352,22 +352,31 @@ function getRollTimestamp(user) {
  * Add a rolled mosnter to the active "rolled" buffer/collection. This
  * lets users have the oppurtunity to choose between rolls before
  * claiming a subset of them.
+ * @param {string} user User rolling monster
  * @param {string} name Monster name
  * @param {string} url Monster image URL
  */
-async function addRollToBuffer(name, url) {
+async function addRollToBuffer(user, name, url) {
     const rolled = db.collection("rolled");
-    const currTime = new Date();
     await rolled.insertOne({
         "claimId": claimId.toString(),
         "monName": name,
         "monUrl": url,
-        "rollTime": currTime,
-    })
+        "rolledBy": user,
+    });
     rutil.mlog(`${name} successfully added to rolled buffer with ID ${claimId}`);
     
+    // call a timeout (1 minute) function to clear monster from buffer
+    setTimeout(removeRollFromBuffer, 60 * 1000, user, name);
+
     // return ID and update to next unique ID 
     const oldClaimId = claimId;
     claimId = (claimId + 1) % 900;
     return oldClaimId;
+}
+
+function removeRollFromBuffer(user, name) {
+    const rolled = db.collection("rolled");
+    rolled.deleteOne({"rolledBy": user, "monName": name});   
+    console.log(`Removed ${name} rolled by ${user}`);
 }
