@@ -31,7 +31,8 @@ function rollMonster() {
     }
     let roll = {
         url: drop.url,
-        name: drop.name
+        name: drop.name,
+        rarity: drop.rarity,
     };
 
     return roll;
@@ -62,6 +63,7 @@ readThreeStar.on('line', function(line) {
     let mon = {
         url: newline[0],
         name: newline[1],
+        rarity: "three-star",
     };
     three_star_drops.push(mon);
 });
@@ -70,6 +72,7 @@ readFourStar.on('line', function(line) {
     let mon = {
         url: newline[0],
         name: newline[1].toString().substr(1),
+        rarity: "four-star",
     };
     four_star_drops.push(mon);
 });
@@ -78,6 +81,7 @@ readFiveStar.on('line', function(line) {
     let mon = {
         url: newline[0],
         name: newline[1].toString().substr(1),
+        rarity: "five-star",
     };
     five_star_drops.push(mon);
 });
@@ -86,6 +90,7 @@ readFiveStarGod.on('line', function(line) {
     let mon = {
         url: newline[0],
         name: newline[1].toString().substr(1),
+        rarity: "god",
     };
     five_star_gods.push(mon);
 });
@@ -94,6 +99,7 @@ readGFE.on('line', function(line) {
     let mon = {
         url: newline[0],
         name: newline[1].toString().substr(1),
+        rarity: "gfe",
     };
     GFE.push(mon);
 });

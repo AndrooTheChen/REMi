@@ -64,8 +64,9 @@ function roll(user, msg) {
                 mongoUser.addRollTimestamp(user);
             }
 
+            // roll for monster
             roll = monster.rollMonster();
-            mongoUser.addRollToBuffer(user, roll.name, roll.url).then((claimId) => {
+            mongoUser.addRollToBuffer(user, roll).then((claimId) => {
                 rutil.clog(`${user} rolled ${roll.name} with active rolled ID ${claimId}`);
 
                 // create embed message to display roll to chat

@@ -242,7 +242,8 @@ function claimMonster(user, name) {
             addMonsterToBoxById(user, result.monName);
 
             // remove monster from active collection
-            removeRollFromBuffer(user, name);
+            rolled.deleteOne({"rolledBy": user, "monName": name});   
+            rutil.mlog(`Removed ${name} rolled by ${user} due to claim`);
             return result.monName;
         }
     });
@@ -356,18 +357,19 @@ function getRollTimestamp(user) {
  * @param {string} name Monster name
  * @param {string} url Monster image URL
  */
-async function addRollToBuffer(user, name, url) {
+async function addRollToBuffer(user, roll) {
     const rolled = db.collection("rolled");
     await rolled.insertOne({
         "claimId": claimId.toString(),
-        "monName": name,
-        "monUrl": url,
+        "monName": roll.name,
+        "monUrl": roll.url,
+        "rarity": roll.rarity,
         "rolledBy": user,
     });
-    rutil.mlog(`${name} successfully added to rolled buffer with ID ${claimId}`);
+    rutil.mlog(`${roll.name} successfully added to rolled buffer with ID ${claimId}`);
     
     // call a timeout (1 minute) function to clear monster from buffer
-    setTimeout(removeRollFromBuffer, 60 * 1000, user, name);
+    setTimeout(disenchantFromBuffer, 60 * 1000, user, roll);
 
     // return ID and update to next unique ID 
     const oldClaimId = claimId;
@@ -375,8 +377,46 @@ async function addRollToBuffer(user, name, url) {
     return oldClaimId;
 }
 
-function removeRollFromBuffer(user, name) {
+/**
+ * This function when called deletes a specific monster from the active
+ * rolled buffer. This will also disenchant points to the user that rolled
+ * the respective monster according to its rarity.
+ * @param {string} user Username for user requesting info
+ * @param {Object} roll Contains monster name, URL, and rarity
+ */
+async function disenchantFromBuffer(user, roll) {
     const rolled = db.collection("rolled");
-    rolled.deleteOne({"rolledBy": user, "monName": name});   
-    console.log(`Removed ${name} rolled by ${user}`);
+    const deleted = await rolled.deleteOne({"rolledBy": user, "monName": roll.name});   
+    
+    if (deleted.deletedCount) {
+        const users = db.collection("users");
+        rutil.mlog(`Removed ${roll.name} rolled by ${user} due to timeout`);
+        rutil.mlog(`Monster expired, disenchanting...`);
+        
+        // determine point distrubtion based on monster rarity
+        let points;
+        switch(roll.rarity) {
+            case "three-star":
+                points = 1;
+            break;
+            case "four-star":
+                points = 2;
+            break;
+            case "five-star":
+                points = 3;
+            break;
+            case "god":
+                points = 5;
+            break;
+            case "gfe":
+                points = 8;
+            break;
+        }
+
+        users.updateOne(
+            {"username": user},
+            {$inc: {"monPts": points}},
+        );
+        rutil.mlog(`Disenchanted ${points} pts for ${user} `)
+    }
 }
