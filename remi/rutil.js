@@ -1,6 +1,8 @@
 // rutil.js
 // ======
-let module;
+//let require;
+//let process;
+//let module;
 
 const hearts = new Set([`%E2%9D%A4%EF%B8%8F` /* :heart: */, 
                         `%E2%99%A5%EF%B8%8F` /* :hearts: */,

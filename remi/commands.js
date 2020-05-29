@@ -1,8 +1,5 @@
 // commands.js
 // ===========
-let require;
-let module;
-
 const Discord = require('discord.js');
 const mongoUser = require('./mongoUsers');
 const monster = require('./monster');

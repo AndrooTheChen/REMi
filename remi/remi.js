@@ -1,8 +1,5 @@
 // remij.s
 // =======
-var require;
-var process;
-
 const Discord = require('discord.js');
 const {MessageEmbed} = require('discord.js')
 const client = new Discord.Client();

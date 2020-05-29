@@ -1,9 +1,5 @@
 // monster.js
 // ==========
-let require;
-let process;
-let module;
-
 // for parsing text files
 const readline = require('readline');
 const fs = require('fs');
@@ -23,13 +19,18 @@ function rollMonster() {
     const tier = Math.floor(Math.random() * 100) + 1;
     let drop;
 
+    console.log(tier);
     if (tier <= 10) {
+        // 10% chance for 3*
         drop = three_star_drops[Math.floor(Math.random() * three_star_drops.length)];
     } else if (tier > 10 && tier <= 45) {
-        drop = four_star_drops[Math.floor(Math.random() * four_star_drops.length)];
+        // 35% chance for 4* or 5* non-god
+        drop = (Math.random() < 0.5) ? four_star_drops[Math.floor(Math.random() * four_star_drops.length)]:five_star_drops[Math.floor(Math.random() * five_star_drops.length)];
     } else if (tier > 45 && tier <= 90) {
-        drop = five_star_drops[Math.floor(Math.random() * five_star_drops.length)];
+        // 45% chance for 5* god
+        drop = five_star_gods[Math.floor(Math.random() * five_star_gods.length)];
     } else {
+        // 10% chance for GFE
         drop = GFE[Math.floor(Math.random() * GFE.length)];
     }
     let roll = {
