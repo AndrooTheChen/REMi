@@ -1,5 +1,8 @@
 // monster.js
 // ==========
+let require;
+let process;
+let module;
 
 // for parsing text files
 const readline = require('readline');

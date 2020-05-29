@@ -1,5 +1,8 @@
 // commands.js
 // ===========
+let require;
+let module;
+
 const Discord = require('discord.js');
 const mongoUser = require('./mongoUsers');
 const monster = require('./monster');
@@ -66,7 +69,7 @@ function roll(user, msg) {
             }
 
             // roll for monster
-            roll = monster.rollMonster();
+            const roll = monster.rollMonster();
             mongoUser.addRollToBuffer(user, roll).then((claimId) => {
                 rutil.clog(`${user} rolled ${roll.name} with active rolled ID ${claimId}`);
 

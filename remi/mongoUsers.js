@@ -1,5 +1,8 @@
 // mongoUsers.js
 // =============
+let require;
+let module;
+
 const rutil = require(`./rutil`);
 
 // connect to DB
