@@ -1,5 +1,8 @@
 // remij.s
 // =======
+var require;
+var process;
+
 const Discord = require('discord.js');
 const {MessageEmbed} = require('discord.js')
 const client = new Discord.Client();
@@ -50,10 +53,15 @@ client.on('message', msg => {
         return;
     let args = msg.content.substring(1).split(' ');
     const cmd = args[0];
-       
+    let now;
+    let reset;
+    let randomColor;
+    let embed;
+    
     // argument for some commands
     args = args.splice(1);
 
+    // user inputting command
     user = msg.author.username;
 
     // commands:
@@ -141,7 +149,7 @@ client.on('message', msg => {
     
             // %timediff
             case `td`:
-                const reset = new Date();
+                reset = new Date();
                 mongoUser.getRollTimestamp(user).then((timestamp) => {
                     const ffLater = new Date(timestamp.getTime() + 45 *60000);
                     rutil.log(`45 min after last roll is ${rutil.printTimeStamp(ffLater)}`);
@@ -164,8 +172,8 @@ client.on('message', msg => {
 
             // %msg
             case `msg`:
-                const randomColor = Math.floor(Math.random()*16777215).toString(16);
-                const embed = new MessageEmbed()
+                randomColor = Math.floor(Math.random()*16777215).toString(16);
+                embed = new MessageEmbed()
                 .setTitle('Artemis')
                 .setColor(randomColor)
                 .setDescription('uwu kawaiiiii')
