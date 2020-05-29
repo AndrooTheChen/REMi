@@ -17,7 +17,7 @@ const GFE = [];
  * @return {url, name} The key-value pair of the roll
  */
 function rollMonster() {
-    tier = Math.floor(Math.random() * 100) + 1;
+    const tier = Math.floor(Math.random() * 100) + 1;
     let drop;
 
     if (tier <= 10) {
@@ -40,7 +40,8 @@ function rollMonster() {
 
 // Read in the monsters, segregate, and store
 // const monFile = `${process.env.WINHOME}Androo/bots/remy/monsters`;
-const monFile = `${process.env.HOME}/Workspace/remi/monsters`;
+// const monFile = `${process.env.HOME}/Workspace/remi/monsters`;
+const monFile = `${process.env.HOME}/Workspace/REMi/monsters`;
 
 const readThreeStar = readline.createInterface({
     input: fs.createReadStream(`${monFile}/three_star_drops.txt`)
