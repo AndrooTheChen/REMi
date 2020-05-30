@@ -1,2 +1,5 @@
 auth.json
 node_modules
+dump
+remiDB_backup
+.eslintrc.json

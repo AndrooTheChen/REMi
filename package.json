@@ -1,8 +1,8 @@
 {
-  "name": "remy",
+  "name": "remi",
   "version": "1.0.0",
-  "description": "",
-  "main": "remy.js",
+  "description": "Simple Puzzle & Dragons Discord bot",
+  "main": "remi.js",
   "dependencies": {
     "discord.js": "^12.2.0",
     "mongodb": "^3.5.7"
