@@ -3,6 +3,7 @@
 // for parsing text files
 const readline = require('readline');
 const fs = require('fs');
+const path = require('path');
 
 // store monsters in arrays
 const three_star_drops = [];
@@ -43,24 +44,27 @@ function rollMonster() {
 }
 
 // Read in the monsters, segregate, and store
-// const monFile = `${process.env.WINHOME}Androo/bots/remy/monsters`;
-// const monFile = `${process.env.HOME}/Workspace/remi/monsters`;
-const monFile = `${process.env.HOME}/Workspace/REMi/monsters`;
+const threeStarFile = 'monsters/three_star_drops.txt';
+const fourStarFile = 'monsters/four_star_drops.txt';
+const fiveStarFile = 'monsters/five_star_drops.txt';
+const fiveStarGodsFile = 'monsters/five_star_gods.txt';
+const GFEFile = 'monsters/GFE.txt';
 
 const readThreeStar = readline.createInterface({
-    input: fs.createReadStream(`${monFile}/three_star_drops.txt`)
+      input: fs.createReadStream(threeStarFile)
 });
+
 const readFourStar = readline.createInterface({
-    input: fs.createReadStream(`${monFile}/four_star_drops.txt`)
+      input: fs.createReadStream(fourStarFile)
 });
 const readFiveStar = readline.createInterface({
-    input: fs.createReadStream(`${monFile}/five_star_drops.txt`)
+      input: fs.createReadStream(fiveStarFile)
 });
 const readFiveStarGod = readline.createInterface({
-    input: fs.createReadStream(`${monFile}/five_star_gods.txt`)
+      input: fs.createReadStream(fiveStarGodsFile)
 });
 const readGFE= readline.createInterface({
-    input: fs.createReadStream(`${monFile}/GFE.txt`)
+      input: fs.createReadStream(GFEFile)
 });
 
 readThreeStar.on('line', function(line) {

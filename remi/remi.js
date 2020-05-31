@@ -193,3 +193,10 @@ process.on('SIGINT', () => {
     mongoUser.mongo_client.close();
     process.exit(0);
 });
+
+process.on('SIGTERM', () => {
+    rutil.warn(`\nSIGINT received! Shutting down REMi`);
+    mongoUser.mongo_client.close();
+    process.exit(0);
+});
+
