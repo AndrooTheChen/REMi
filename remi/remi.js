@@ -56,7 +56,8 @@ client.on('message', msg => {
                             `**%help** - list commands\n` +
                             `**%claimid** ***<ID>*** - claim a monster by ID\n` + 
                             `**%monbox** - print your monster box\n` +
-                            `**%myrolls** - print your rolls\n`);
+                            `**%myrolls** - print your rolls\n` +
+                            `**%myclaims** - print your claims\n`);
         break;
 
         // %roll
