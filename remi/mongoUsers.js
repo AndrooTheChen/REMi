@@ -5,8 +5,6 @@ const rutil = require(`./rutil`);
 // connect to DB
 const {MongoClient} = require("mongodb");
 const uri = "mongodb://localhost:27017";
-//const uri = "mongodb://98.215.8.143:49150";
-//const uri = "mongodb://localhost:49150";
 const mongo_client = new MongoClient(uri, { useUnifiedTopology: true });
 let db;
 module.export = {"mongo_client": mongo_client};

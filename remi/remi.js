@@ -74,7 +74,7 @@ client.on('message', msg => {
     // commands:
     if (NO_DB == 1) {
         // don't check if the user is in the DB if we are running detatched from DB
-        msg.channel.send(`***WARNING:*** Executing command without Database! Some commands may not work`);
+        msg.channel.send(`***WARNING:***  Executing command without Database! Some commands may not work.`);
         cmds.exec(cmd, user, msg);
     } else {
         mongoUser.checkUser(user).then(() => {
