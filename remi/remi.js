@@ -8,17 +8,27 @@ const mongoUser = require('./mongoUsers');
 const rutil = require ('./rutil');
 const cmds = require('./commands');
 
-let user;
+// 1 if in running without database for debug mode, 0 otherwise
+let NO_DB  = 0;
+
+// get commandline arguments
+const args = process.argv.slice(2);
+if (args == "debug") {
+    rutil.warn(`RUNNING IN DEBUG MODE`);
+    NO_DB = 1;
+}
 
 // connect to database
-mongoUser.connectDB().then((status) => {
-    if (status == `success`) {
-        rutil.log(`connectDB returned: ${status}`);
-    } else {
-        rutil.warn(`connectDB returned failure, shutting down`);
-        process.exit(1);
-    }
-});
+if (NO_DB == 0) {
+    mongoUser.connectDB().then((status) => {
+        if (status == `success`) {
+            rutil.log(`connectDB returned: ${status}`);
+        } else {
+            rutil.warn(`connectDB returned failure, shutting down`);
+            process.exit(1);
+        }
+    });
+}
 
 /**
  * Output console log when bot is logged in.
@@ -59,129 +69,18 @@ client.on('message', msg => {
     args = args.splice(1);
 
     // user inputting command
-    user = msg.author.username;
+    const user = msg.author.username;
 
     // commands:
-    mongoUser.checkUser(user).then(() => {
-        rutil.log(`[USER COMMAND] ${user} ran cmd: ${cmd}`);
-        switch(cmd) {
-            // %ping
-            case 'ping':
-                msg.reply("pong!");
-            break;
-    
-            // %help
-            case 'help':
-                cmds.help(msg);
-            break;
-    
-            // %roll
-            case 'roll':
-            case 'r':
-                cmds.roll(user, msg);
-            break;
-    
-            // %claim <monsterName>
-            case 'claim':
-            case 'cn':
-                
-            break;
-    
-            // %claimid <claimId>
-            case 'claimid':
-            case 'ci':
-                cmds.claimid(user, args, msg);                
-            break;
-    
-            case 'monbox':
-            case 'mon':
-            case 'mb':
-                cmds.monbox(user, msg);
-            break;
-    
-            // %myrolls
-            case 'myrolls':
-            case 'mr':
-                cmds.myrolls(user, msg);
-            break;
-    
-            // %myclaims
-            case 'myclaims':
-            case 'mc':
-                cmds.myclaims(user, msg);
-            break;
-    
-            // DEBUG ========================================
-            // These commands will be removed or switched to an Admin-only
-            // role in the future.
-    
-            // %test
-            case 'test':
-                rutil.log(`Testing checkUser`);
-                // mongoUser.checkUser(user);
-                rutil.log(`userCheck finished`);
-            break;
-    
-            // print db
-            case `print`:
-                mongoUser.printUsers();
-                mongoUser.printRolled();
-            break;
-    
-            case `collections`:
-                mongoUser.printCollections();
-            break;
-    
-            // %time
-            case `time`:
-                now = new Date();
-                mongoUser.getRollTimestamp(user).then((time) => {
-                    rutil.log(`Time returned: ${time}`);
-                    const diff = now - time;
-                    rutil.log(`Time diff: ${diff}`);
-                    msg.channel.send(`Time since last roll: ${rutil.printTimeStamp(diff)}`);
-                });
-                
-            break;
-    
-            // %timediff
-            case `td`:
-                reset = new Date();
-                mongoUser.getRollTimestamp(user).then((timestamp) => {
-                    const ffLater = new Date(timestamp.getTime() + 45 *60000);
-                    rutil.log(`45 min after last roll is ${rutil.printTimeStamp(ffLater)}`);
-                    const diff = (ffLater > reset) ? ffLater - reset : 0;
-                    msg.channel.send(`Need to wait ${rutil.printTimeStamp(diff)}`);
-                });
-            break;
-    
-            // %rr - reset rolls
-            case `rr`:
-                rutil.warn(`Resetting ${user} to 10 rolls`)
-                mongoUser.setRolls(user, 10);
-            break;
-    
-            // %rc - reset claims
-            case `rc`:
-                rutil.warn(`Resetting ${user} to 3 claims`)
-                mongoUser.setClaims(user, 3);
-            break;
-
-            // %msg
-            case `msg`:
-                randomColor = Math.floor(Math.random()*16777215).toString(16);
-                embed = new MessageEmbed()
-                .setTitle('Artemis')
-                .setColor(randomColor)
-                .setDescription('uwu kawaiiiii')
-                .setImage('http://puzzledragonx.com/en/img/monster/MONS_571.jpg');
-                msg.channel.send(embed);
-            break;
-    
-            // DEBUG ========================================
-    
-        }
-    });
+    if (NO_DB == 1) {
+        // don't check if the user is in the DB if we are running detatched from DB
+        msg.channel.send(`***WARNING:*** Executing command without Database! Some commands may not work`);
+        cmds.exec(cmd, user, msg);
+    } else {
+        mongoUser.checkUser(user).then(() => {
+            cmds.exec(cmd, user, msg);
+        });
+    }
 });
 
 // login to the bot

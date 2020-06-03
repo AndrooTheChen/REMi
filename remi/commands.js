@@ -9,6 +9,7 @@ const {MessageEmbed} = require('discord.js')
 module.exports = {
     claim,
     claimid,
+    exec,
     help,
     monbox,
     myrolls,
@@ -24,6 +25,127 @@ let now;
 // Local variables for embedding messages
 let embed;
 let randomColour;
+
+/**
+ * Parse command and execute the correct one
+ * @param {string} cmd Command executed by user
+ * @param {string} user User executing command
+ * @param {string} msg Argument for command 
+ */
+function exec(cmd, user, msg) {
+    rutil.log(`[USER COMMAND] ${user} ran cmd: ${cmd}`);
+    switch(cmd) {
+       // %ping
+       case 'ping':
+           msg.reply("pong!");
+       break;
+
+       // %help
+       case 'help':
+           help(msg);
+       break;
+
+       // %roll
+       case 'roll':
+       case 'r':
+           roll(user, msg);
+       break;
+
+       // %claimid <claimId>
+       case 'claimid':
+       case 'ci':
+           claimid(user, args, msg);                
+       break;
+
+       case 'monbox':
+       case 'mon':
+       case 'mb':
+           monbox(user, msg);
+       break;
+
+       // %myrolls
+       case 'myrolls':
+       case 'mr':
+           myrolls(user, msg);
+       break;
+
+       // %myclaims
+       case 'myclaims':
+       case 'mc':
+           myclaims(user, msg);
+       break;
+
+       // DEBUG ========================================
+       // These commands will be removed or switched to an Admin-only
+       // role in the future.
+
+       // %test
+       case 'test':
+           rutil.log(`Testing checkUser`);
+           // mongoUser.checkUser(user);
+           rutil.log(`userCheck finished`);
+       break;
+
+       // print db
+       case `print`:
+           mongoUser.printUsers();
+           mongoUser.printRolled();
+       break;
+
+       case `collections`:
+           mongoUser.printCollections();
+       break;
+
+       // %time
+       case `time`:
+           now = new Date();
+           mongoUser.getRollTimestamp(user).then((time) => {
+               rutil.log(`Time returned: ${time}`);
+               const diff = now - time;
+               rutil.log(`Time diff: ${diff}`);
+               msg.channel.send(`Time since last roll: ${rutil.printTimeStamp(diff)}`);
+           });
+           
+       break;
+
+            // %timediff
+            case `td`:
+                reset = new Date();
+                mongoUser.getRollTimestamp(user).then((timestamp) => {
+                    const ffLater = new Date(timestamp.getTime() + 45 *60000);
+                    rutil.log(`45 min after last roll is ${rutil.printTimeStamp(ffLater)}`);
+                    const diff = (ffLater > reset) ? ffLater - reset : 0;
+                    msg.channel.send(`Need to wait ${rutil.printTimeStamp(diff)}`);
+                });
+       break;
+ 
+       // %rr - reset rolls
+       case `rr`:
+           rutil.warn(`Resetting ${user} to 10 rolls`)
+           mongoUser.setRolls(user, 10);
+       break;
+ 
+       // %rc - reset claims
+       case `rc`:
+           rutil.warn(`Resetting ${user} to 3 claims`)
+           mongoUser.setClaims(user, 3);
+       break;
+
+       // %msg
+       case `msg`:
+           randomColor = Math.floor(Math.random()*16777215).toString(16);
+           embed = new MessageEmbed()
+           .setTitle('Artemis')
+           .setColor(randomColor)
+           .setDescription('uwu kawaiiiii')
+           .setImage('http://puzzledragonx.com/en/img/monster/MONS_571.jpg');
+           msg.channel.send(embed);
+       break;
+ 
+       // DEBUG ========================================
+    
+        }
+}
 
 /**
  * Print the available REMi commands to user in Discord.
