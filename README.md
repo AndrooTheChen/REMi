@@ -6,8 +6,8 @@ Discord bot to emulate the Rare Egg Machine gacha from mobile game Puzzle & Drag
 **%roll** - roll for a monster!  
 ~~**%claimid** - claim a rolled monster by ID~~ DEPRECATED, claim by react/emojis over messages instead  
 **%monbox** - print monster box of collected monsters  
-**%myrolls* - see how many rolls you have left  
-**%myclaims* - see how many claims you have left  
+**%myrolls** - see how many rolls you have left  
+**%myclaims** - see how many claims you have left  
 **%help** - list all commands  
 
 ## Files
