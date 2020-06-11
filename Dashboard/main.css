@@ -1,5 +1,39 @@
+/* webpage background color and font color */
 body
 {
     background-color: #343a40;
     color: white;
 }
+
+/* navbar container size */
+@media (min-width: 1440px) {
+    .navbar-container{
+        max-width: 1440px;
+    }
+}
+
+/* search bar color change from default */
+.btn.btn-outline-success {
+    color:deepskyblue;
+    border-color: deepskyblue;
+}
+.btn.btn-outline-success:hover {
+    color:white;
+    border-color: deepskyblue;
+    background-color: deepskyblue;
+    outline: none;
+    box-shadow: none;
+}
+.btn.btn-outline-success.active.focus,
+.btn.btn-outline-success.active:focus,
+.btn.btn-outline-success.active:hover,
+.btn.btn-outline-success:active.focus,
+.btn.btn-outline-success:active:focus,
+.btn.btn-outline-success:active:hover {
+    color: deepskyblue;
+    background-color: deepskyblue;
+    border-color: deepskyblue;
+    outline: none;
+    box-shadow: none;
+}
+  
