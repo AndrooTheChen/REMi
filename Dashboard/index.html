@@ -15,32 +15,37 @@
     <div class="container navbar-container">
       <!-- Navigation Bar -->
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <!-- REMi brand and Toggle Button-->
-        <button class="navbar-toggler navbar-toggler-left" type="button" data-toggle="collapse" data-target="#navbarLinks" aria-controls="navbarLinks" aria-expanded="false" aria-label="toggle navigation">
-          <span class="navbar-toggler-icon"></span>  
-        </button>
-        <a class="navbar-brand" href="#">REMi</a>
-        <!-- to replace REMi brand with an image of REMi in Puzzles and Dragons Font in the future-->
-        <!-- Content within collapsible NavBar-->
-        <div class="collapse navbar-collapse" id="navbarLinks">
-          <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-            <li class="nav-item active">
-              <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>  
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">How To</a>
-            </li>  
-            <li class="nav-item">
-              <a class="nav-link" href="#">Leaderboard</a>  
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="https://github.com/AndrooTheChen/REMi">Repository</a>  
-            </li>
-          </ul>  
+        <div id="topleft">
+            <!-- REMi brand and Toggle Button-->
+          <div class="floatl">
+            <button class="navbar-toggler navbar-toggler-left mx-2 mb-auto mt-3 floatl" type="button" data-toggle="collapse" data-target="#navbarLinks" aria-controls="navbarLinks" aria-expanded="false" aria-label="toggle navigation">
+              <span class="navbar-toggler-icon"></span>  
+            </button>
+          
+            <a class="navbar-brand mt-3 mb-1" href="#">REMi</a>
+            <!-- to replace REMi brand with an image of REMi in Puzzles and Dragons Font in the future-->
+            <!-- Content within collapsible NavBar-->
+          </div>
+          <div class="collapse navbar-collapse ml-2 floatl" id="navbarLinks">
+            <ul class="navbar-nav mt-sm-3 mr-auto mb-auto">
+              <li class="nav-item active">
+                <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>  
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">How To</a>
+              </li>  
+              <li class="nav-item">
+                <a class="nav-link" href="#">Leaderboard</a>  
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="https://github.com/AndrooTheChen/REMi">Repository</a>  
+              </li>
+            </ul>  
+          </div>
         </div>
-        <form class="form-inline my-2 my-lg-0">
-          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Go!">
-          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Go!</button>
+        <form class="form-inline mb-auto mt-2 my-lg-0" id= "topright">
+          <input class="form-control mr-sm-2 floatl" type="search" placeholder="Search" aria-label="Go!">
+          <button class="btn btn-outline-success my-2 my-sm-0 floatl" type="submit">Go!</button>
         </form>
       </nav>
     </div>

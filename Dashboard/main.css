@@ -36,4 +36,30 @@ body
     outline: none;
     box-shadow: none;
 }
-  
+
+.floatl{
+    float : left;
+}
+
+.floatr{
+    float : right;
+}
+
+.form-control{
+    width: 65%;
+}
+
+#topleft {
+    float : left;
+    margin-right : auto;
+    margin-bottom : auto;
+    max-width : 50%;
+}
+
+#topright {
+    float : right;
+    margin-left: auto;
+    margin-bottom : auto;
+    max-width : 50%;
+    align-content: right;
+}
