@@ -154,10 +154,13 @@ function exec(cmd, user, msg) {
 function help(msg) {
     msg.channel.send(`**%roll** - roll for a monster!\n` + 
                                 `**%help** - list commands\n` +
-                                `**%claimid** ***<ID>*** - claim a monster by ID\n` + 
                                 `**%monbox** - print your monster box\n` +
-                                `**%myrolls** - print your rolls\n` +
-                                `**%myclaims** - print your claims\n`);
+                                `**%myrolls** - print your rolls.\n` +
+                                `**%myclaims** - print your claims.\n\n` +
+                                `__***FAQ***__\n` +
+                                `You have **60** seconds to claim a monster from when it is rolled.\n` +
+                                `You may roll up to **10** times every **45** minutes\n` +
+                                `You may claim up to **3** monsters every **45** minutes\n`);
 }
 
 /**
