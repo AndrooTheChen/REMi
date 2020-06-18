@@ -183,8 +183,8 @@ async function checkUser(user) {
             rutil.mlog(`${user} is not yet registered.`);
             users.insertOne({
                 "username": user,
-                "numRolls": 10,
-                "numClaims": 3,
+                "numRolls": 6,
+                "numClaims": 2,
                 "firstRollTime": "",
                 "firstClaimTime": "",
                 "monPts": 0,
@@ -197,18 +197,18 @@ async function checkUser(user) {
         } else {
             rutil.mlog (`[CheckUser] User ${user} already in ${db.databaseName}`);
             
-            // reset user rolls to 10 after 45 minutes after their first roll
+            // reset user rolls to 6 after 45 minutes after their first roll
             const rollPromise = getRollTimestamp(user).then((firstRollTime) => {
                 if (timeToReset(firstRollTime) == true) {
-                    setRolls(user, 10);
-                    rutil.mlog(`Resetting ${user}'s rolls to 10`);
+                    setRolls(user, 6);
+                    rutil.mlog(`Resetting ${user}'s rolls to 6`);
                 }
             });
 
-            // reset user claims to 3 after 45 minutes after their first claim
+            // reset user claims to 2 after 45 minutes after their first claim
             const claimPromise = getClaimTimestamp(user).then((firstClaimTime) => {
                 if (timeToReset(firstClaimTime) == true) {
-                    setClaims(user, 3);
+                    setClaims(user, 2);
                     rutil.mlog(`Resetting ${user}'s claims to 3`);
                 }
             });

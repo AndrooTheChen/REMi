@@ -159,8 +159,8 @@ function help(msg) {
                                 `**%myclaims** - print your claims.\n\n` +
                                 `__***FAQ***__\n` +
                                 `You have **60** seconds to claim a monster from when it is rolled.\n` +
-                                `You may roll up to **10** times every **45** minutes\n` +
-                                `You may claim up to **3** monsters every **45** minutes\n`);
+                                `You may roll up to **6** times every **45** minutes\n` +
+                                `You may claim up to **2** monsters every **45** minutes\n`);
 }
 
 /**
