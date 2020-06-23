@@ -1,10 +1,10 @@
 // commands.js
 // ===========
 const Discord = require('discord.js')
+const { MessageEmbed } = Discord
 const mongoUser = require('./mongoUsers')
 const monster = require('./monster')
 const rutil = require('./rutil')
-const { MessageEmbed } = require('discord.js')
 
 module.exports = {
   claim,
@@ -54,7 +54,7 @@ function exec (cmd, user, msg) {
       // %claimid <claimId>
     case 'claimid':
     case 'ci':
-      claimid(user, args, msg)
+      claimid(user, undefined, msg)
       break
 
     case 'monbox':
@@ -111,12 +111,12 @@ function exec (cmd, user, msg) {
       // %timediff
     case 'td':
       (reset => {
-      mongoUser.getRollTimestamp(user).then((timestamp) => {
-        const ffLater = new Date(timestamp.getTime() + 45 * 60000)
-        rutil.log(`45 min after last roll is ${rutil.printTimeStamp(ffLater)}`)
-        const diff = (ffLater > reset) ? ffLater - reset : 0
-        msg.channel.send(`Need to wait ${rutil.printTimeStamp(diff)}`)
-      })
+        mongoUser.getRollTimestamp(user).then((timestamp) => {
+          const ffLater = new Date(timestamp.getTime() + 45 * 60000)
+          rutil.log(`45 min after last roll is ${rutil.printTimeStamp(ffLater)}`)
+          const diff = (ffLater > reset) ? ffLater - reset : 0
+          msg.channel.send(`Need to wait ${rutil.printTimeStamp(diff)}`)
+        })
       })(new Date())
       break
 
@@ -135,12 +135,12 @@ function exec (cmd, user, msg) {
       // %msg
     case 'msg':
       (color => {
-      embed = new MessageEmbed()
-        .setTitle('Artemis')
+        embed = new MessageEmbed()
+          .setTitle('Artemis')
           .setColor(color)
           .setDescription('uwu kawaiiiii') // this is mega cringe.
-        .setImage('http://puzzledragonx.com/en/img/monster/MONS_571.jpg')
-      msg.channel.send(embed)
+          .setImage('http://puzzledragonx.com/en/img/monster/MONS_571.jpg')
+        msg.channel.send(embed)
       })(Math.floor(Math.random() * 16777215).toString(16))
       break
 
@@ -176,17 +176,17 @@ function help (msg) {
  */
 function roll (user, msg) {
   mongoUser.checkRolls(user).then((numRolls) => {
-    if (numRolls == 0) {
+    if (numRolls === 0) {
       // print how long user has to wait before rolling again
       msg.channel.send(`**${user}** has no rolls left!`)
-      const roll_now = new Date()
+      const rollNow = new Date()
       mongoUser.getRollTimestamp(user).then((rollTime) => {
         ffLater = new Date(rollTime.getTime() + 45 * 60000)
-        timeDiff = (ffLater > roll_now) ? ffLater - roll_now : 0
+        timeDiff = (ffLater > rollNow) ? ffLater - rollNow : 0
         msg.channel.send(`Need to wait ${rutil.printTimeStamp(timeDiff)} for rolls to reset`)
       })
     } else {
-      if (numRolls == 10) {
+      if (numRolls === 10) {
         // add timestamp for the first roll
         mongoUser.addRollTimestamp(user)
       }
@@ -224,23 +224,23 @@ function roll (user, msg) {
 function claim (user, args, msg) {
   mongoUser.checkClaims(user).then((numClaims) => {
     // check if user has enough claims
-    if (numClaims == 0) {
+    if (numClaims === 0) {
       msg.channel.send(`**${user}** has no claims left!`)
-      const claim_now = new Date()
+      const claimNow = new Date()
       mongoUser.getClaimTimestamp(user).then((claimTime) => {
         ffLater = new Date(claimTime.getTime() + (45 * 60000))
-        timeDiff = (ffLater > claim_now) ? ffLater - claim_now : 0
+        timeDiff = (ffLater > claimNow) ? ffLater - claimNow : 0
         msg.channel.send(`Need to wait ${rutil.printTimeStamp(timeDiff)} for claims to reset`)
       })
     } else {
-      if (numClaims == 3) {
+      if (numClaims === 3) {
         // record the time for the user's first claim
         mongoUser.addClaimTimestamp(user)
       }
 
       rutil.clog('User has enough claims')
       mongoUser.claimMonster(user, args).then((claimed) => {
-        if (claimed.toString() == 'FAILED') {
+        if (claimed.toString() === 'FAILED') {
           rutil.mlog(`CLAIM ERROR! ${args} not found in 'rolled' buffer.`)
           return
         }
@@ -266,23 +266,23 @@ function claim (user, args, msg) {
 function claimid (user, args, msg) {
   mongoUser.checkClaims(user).then((numClaims) => {
     // check if user has enough claims
-    if (numClaims == 0) {
+    if (numClaims === 0) {
       msg.channel.send(`**${user}** has no claims left!`)
-      const claim_now = new Date()
+      const claimNow = new Date()
       mongoUser.getClaimTimestamp(user).then((claimTime) => {
         ffLater = new Date(claimTime.getTime() + 45 * 60000)
-        timeDiff = (ffLater > claim_now) ? ffLater - claim_now : 0
+        timeDiff = (ffLater > claimNow) ? ffLater - claimNow : 0
         msg.channel.send(`Need to wait ${rutil.printTimeStamp(timeDiff)} for claims to reset`)
       })
     } else {
-      if (numClaims == 3) {
+      if (numClaims === 3) {
         // record the time for the user's first claim
         mongoUser.addClaimTimestamp(user)
       }
 
       rutil.clog('User has enough claims')
       mongoUser.claimMonsterById(user, args).then((claimed) => {
-        if (claimed.toString() == 'FAILED') {
+        if (claimed.toString() === 'FAILED') {
           msg.channel.send(`**__Error!__** ID ${args} is not a valid ID.`)
         } else {
           msg.channel.send(`**${user}** claimed **${claimed.toString()}**!` +
@@ -318,7 +318,7 @@ function monbox (user, msg) {
 function myrolls (user, msg) {
   mongoUser.checkRolls(user).then((rolls) => {
     msg.channel.send(`**${user}** you currently have **${rolls}** rolls`)
-    if (rolls == 0) {
+    if (rolls === 0) {
       now = new Date()
       mongoUser.getRollTimestamp(user).then((rollTime) => {
         ffLater = new Date(rollTime.getTime() + 45 * 60000)
@@ -338,7 +338,7 @@ function myrolls (user, msg) {
 function myclaims (user, msg) {
   mongoUser.checkClaims(user).then((claims) => {
     msg.channel.send(`**${user}** you currently have **${claims}** claims`)
-    if (claims == 0) {
+    if (claims === 0) {
       now = new Date()
       mongoUser.getClaimTimestamp(user).then((claimTime) => {
         ffLater = new Date(claimTime.getTime() + 45 * 60000)
