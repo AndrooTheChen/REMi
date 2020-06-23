@@ -5,33 +5,11 @@ const rutil = require('./rutil')
 // connect to DB
 const { MongoClient } = require('mongodb')
 const uri = 'mongodb://localhost:27017'
-const mongo_client = new MongoClient(uri, { useUnifiedTopology: true })
+const mongoClient = new MongoClient(uri, { useUnifiedTopology: true })
 let db
-module.export = { mongo_client: mongo_client }
 
 // current claim ID cycles 0-999
 let claimId = 0
-
-module.exports = {
-  addClaimTimestamp,
-  addRollTimestamp,
-  addRollToBuffer,
-  checkUser,
-  checkRolls,
-  checkClaims,
-  claimMonster,
-  claimMonsterById,
-  connectDB,
-  getClaimTimestamp,
-  getRollTimestamp,
-  printCollections,
-  printMonBox,
-  printRolled,
-  printUsers,
-  setClaims,
-  setRolls,
-  mongo_client: mongo_client
-}
 
 /**
  * DEBUG
@@ -39,9 +17,10 @@ module.exports = {
  * collections in remiDB.
  */
 function printCollections () {
-  const db = mongo_client.db('remiDB')
+  const db = mongoClient.db('remiDB')
   db.listCollections().toArray(function (err, results) {
-    if (results.length == 0) console.log('no collections')
+    if (err) return console.log(err)
+    if (results.length === 0) console.log('no collections')
     else console.log('printing collections')
     console.log(JSON.stringify(results))
   })
@@ -53,8 +32,9 @@ function printCollections () {
  * entries in the "users" collection in remiDB.
  */
 function printUsers () {
-  const db = mongo_client.db('remiDB')
+  const db = mongoClient.db('remiDB')
   db.collection('users').find().toArray(function (err, docs) {
+    if (err) return console.log(err)
     console.log(JSON.stringify(docs))
   })
 }
@@ -65,24 +45,25 @@ function printUsers () {
  * entries in the "users" collection in remiDB.
  */
 function printRolled () {
-  const db = mongo_client.db('remiDB')
+  const db = mongoClient.db('remiDB')
   db.collection('rolled').find().toArray(function (err, docs) {
+    if (err) return console.log(err)
     console.log(JSON.stringify(docs))
   })
 }
 
 /**
  * Connect to remiDB. This should be called in the beginning.
- * @return {string} Returns status as `sucess` or `fail`
+ * @return {string} Returns status as `success` or `fail`
  */
 async function connectDB () {
   try {
-    await mongo_client.connect({
+    await mongoClient.connect({
       useUnifiedTopology: true,
       useNewUrlParser: true
     })
     rutil.mlog('Connected to host, looking for database')
-    db = mongo_client.db('remiDB')
+    db = mongoClient.db('remiDB')
     // db = mongo_client.db("pemiDB");
     rutil.mlog(`Connected to database ${db.databaseName}`)
 
@@ -108,8 +89,8 @@ async function checkRolls (user) {
   rutil.mlog(`checking ${user}'s rolls`)
   try {
     const users = db.collection('users')
-    const user_entry = await users.findOne({ username: user })
-    return user_entry.numRolls
+    const { numRolls } = await users.findOne({ username: user })
+    return numRolls
   } catch (ex) {
     rutil.err(`Connection failed! Error: ${ex}`)
   }
@@ -132,8 +113,8 @@ async function checkClaims (user) {
   rutil.mlog(`checking ${user}'s claims`)
   try {
     const users = db.collection('users')
-    const user_entry = await users.findOne({ username: user })
-    return user_entry.numClaims
+    const { numClaims } = await users.findOne({ username: user })
+    return numClaims
   } catch (ex) {
     rutil.err(`Connection failed! Error: ${ex}`)
   }
@@ -197,7 +178,7 @@ async function checkUser (user) {
 
       // reset user rolls to 6 after 45 minutes after their first roll
       const rollPromise = getRollTimestamp(user).then((firstRollTime) => {
-        if (timeToReset(firstRollTime) == true) {
+        if (timeToReset(firstRollTime) === true) {
           setRolls(user, 6)
           rutil.mlog(`Resetting ${user}'s rolls to 6`)
         }
@@ -205,7 +186,7 @@ async function checkUser (user) {
 
       // reset user claims to 2 after 45 minutes after their first claim
       const claimPromise = getClaimTimestamp(user).then((firstClaimTime) => {
-        if (timeToReset(firstClaimTime) == true) {
+        if (timeToReset(firstClaimTime) === true) {
           setClaims(user, 2)
           rutil.mlog(`Resetting ${user}'s claims to 3`)
         }
@@ -417,4 +398,25 @@ async function disenchantFromBuffer (user, roll) {
     )
     rutil.mlog(`Disenchanted ${points} pts for ${user} `)
   }
+}
+
+module.exports = {
+  addClaimTimestamp,
+  addRollTimestamp,
+  addRollToBuffer,
+  checkUser,
+  checkRolls,
+  checkClaims,
+  claimMonster,
+  claimMonsterById,
+  connectDB,
+  getClaimTimestamp,
+  getRollTimestamp,
+  printCollections,
+  printMonBox,
+  printRolled,
+  printUsers,
+  setClaims,
+  setRolls,
+  mongo_client: mongoClient
 }
