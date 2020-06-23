@@ -1,7 +1,6 @@
 // remij.s
 // =======
 const Discord = require('discord.js')
-const { MessageEmbed } = require('discord.js')
 const client = new Discord.Client()
 const auth = require('./auth.json')
 const mongoUser = require('./mongoUsers')
@@ -13,15 +12,15 @@ let NO_DB = 0
 
 // get commandline arguments
 const args = process.argv.slice(2)
-if (args == 'debug') {
+if (args === 'debug') {
   rutil.warn('RUNNING IN DEBUG MODE')
   NO_DB = 1
 }
 
 // connect to database
-if (NO_DB == 0) {
+if (NO_DB === 0) {
   mongoUser.connectDB().then((status) => {
-    if (status == 'success') {
+    if (status === 'success') {
       rutil.log(`connectDB returned: ${status}`)
     } else {
       rutil.warn('connectDB returned failure, shutting down')
@@ -56,13 +55,9 @@ client.on('messageReactionAdd', (reaction, user) => {
 client.on('message', msg => {
   // Our bot needs to know if it will execute a command
   // It will listen for messages that will start with `%`
-  if (msg.content.substring(0, 1) != '%') { return }
+  if (msg.content.substring(0, 1) !== '%') { return }
   let args = msg.content.substring(1).split(' ')
   const cmd = args[0]
-  let now
-  let reset
-  let randomColor
-  let embed
 
   // argument for some commands
   args = args.splice(1)
@@ -71,7 +66,7 @@ client.on('message', msg => {
   const user = msg.author.username
 
   // commands:
-  if (NO_DB == 1) {
+  if (NO_DB === 1) {
     // don't check if the user is in the DB if we are running detatched from DB
     msg.channel.send('***WARNING:***  Executing command without Database! Some commands may not work.')
     cmds.exec(cmd, user, msg)
