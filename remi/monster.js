@@ -3,13 +3,12 @@
 // for parsing text files
 const readline = require('readline')
 const fs = require('fs')
-const path = require('path')
 
 // store monsters in arrays
-const three_star_drops = []
-const four_star_drops = []
-const five_star_drops = []
-const five_star_gods = []
+const threeStarDrops = []
+const fourStarDrops = []
+const fiveStarDrops = []
+const fiveStarGods = []
 const GFE = []
 
 /**
@@ -23,13 +22,13 @@ function rollMonster () {
   console.log(tier)
   if (tier <= 10) {
     // 10% chance for 3*
-    drop = three_star_drops[Math.floor(Math.random() * three_star_drops.length)]
+    drop = threeStarDrops[Math.floor(Math.random() * threeStarDrops.length)]
   } else if (tier > 10 && tier <= 45) {
     // 35% chance for 4* or 5* non-god
-    drop = (Math.random() < 0.5) ? four_star_drops[Math.floor(Math.random() * four_star_drops.length)] : five_star_drops[Math.floor(Math.random() * five_star_drops.length)]
+    drop = (Math.random() < 0.5) ? fourStarDrops[Math.floor(Math.random() * fourStarDrops.length)] : fiveStarDrops[Math.floor(Math.random() * fiveStarDrops.length)]
   } else if (tier > 45 && tier <= 90) {
     // 45% chance for 5* god
-    drop = five_star_gods[Math.floor(Math.random() * five_star_gods.length)]
+    drop = fiveStarGods[Math.floor(Math.random() * fiveStarGods.length)]
   } else {
     // 10% chance for GFE
     drop = GFE[Math.floor(Math.random() * GFE.length)]
@@ -44,10 +43,10 @@ function rollMonster () {
 }
 
 // Read in the monsters, segregate, and store
-const threeStarFile = 'monsters/three_star_drops.txt'
-const fourStarFile = 'monsters/four_star_drops.txt'
-const fiveStarFile = 'monsters/five_star_drops.txt'
-const fiveStarGodsFile = 'monsters/five_star_gods.txt'
+const threeStarFile = 'monsters/threeStarDrops.txt'
+const fourStarFile = 'monsters/fourStarDrops.txt'
+const fiveStarFile = 'monsters/fiveStarDrops.txt'
+const fiveStarGodsFile = 'monsters/fiveStarGods.txt'
 const GFEFile = 'monsters/GFE.txt'
 
 const readThreeStar = readline.createInterface({
@@ -74,7 +73,7 @@ readThreeStar.on('line', function (line) {
     name: newline[1],
     rarity: 'three-star'
   }
-  three_star_drops.push(mon)
+  threeStarDrops.push(mon)
 })
 readFourStar.on('line', function (line) {
   const newline = line.split('@')
@@ -83,7 +82,7 @@ readFourStar.on('line', function (line) {
     name: newline[1].toString().substr(1),
     rarity: 'four-star'
   }
-  four_star_drops.push(mon)
+  fourStarDrops.push(mon)
 })
 readFiveStar.on('line', function (line) {
   const newline = line.split('@')
@@ -92,7 +91,7 @@ readFiveStar.on('line', function (line) {
     name: newline[1].toString().substr(1),
     rarity: 'five-star'
   }
-  five_star_drops.push(mon)
+  fiveStarDrops.push(mon)
 })
 readFiveStarGod.on('line', function (line) {
   const newline = line.split('@')
@@ -101,7 +100,7 @@ readFiveStarGod.on('line', function (line) {
     name: newline[1].toString().substr(1),
     rarity: 'god'
   }
-  five_star_gods.push(mon)
+  fiveStarGods.push(mon)
 })
 readGFE.on('line', function (line) {
   const newline = line.split('@')
@@ -115,9 +114,9 @@ readGFE.on('line', function (line) {
 
 module.exports = {
   rollMonster,
-  three_star_drops: three_star_drops,
-  four_star_drops: four_star_drops,
-  five_star_drops: five_star_drops,
-  five_star_gods: five_star_gods,
+  threeStarDrops: threeStarDrops,
+  fourStarDrops: fourStarDrops,
+  fiveStarDrops: fiveStarDrops,
+  fiveStarGods: fiveStarGods,
   GFE: GFE
 }
