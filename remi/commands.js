@@ -110,13 +110,14 @@ function exec (cmd, user, msg) {
 
       // %timediff
     case 'td':
-      reset = new Date()
+      (reset => {
       mongoUser.getRollTimestamp(user).then((timestamp) => {
         const ffLater = new Date(timestamp.getTime() + 45 * 60000)
         rutil.log(`45 min after last roll is ${rutil.printTimeStamp(ffLater)}`)
         const diff = (ffLater > reset) ? ffLater - reset : 0
         msg.channel.send(`Need to wait ${rutil.printTimeStamp(diff)}`)
       })
+      })(new Date())
       break
 
       // %rr - reset rolls
@@ -133,13 +134,14 @@ function exec (cmd, user, msg) {
 
       // %msg
     case 'msg':
-      randomColor = Math.floor(Math.random() * 16777215).toString(16)
+      (color => {
       embed = new MessageEmbed()
         .setTitle('Artemis')
-        .setColor(randomColor)
-        .setDescription('uwu kawaiiiii')
+          .setColor(color)
+          .setDescription('uwu kawaiiiii') // this is mega cringe.
         .setImage('http://puzzledragonx.com/en/img/monster/MONS_571.jpg')
       msg.channel.send(embed)
+      })(Math.floor(Math.random() * 16777215).toString(16))
       break
 
        // DEBUG ========================================
