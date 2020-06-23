@@ -1,101 +1,99 @@
 // remij.s
 // =======
-const Discord = require('discord.js');
-const {MessageEmbed} = require('discord.js')
-const client = new Discord.Client();
-const auth = require('./auth.json');
-const mongoUser = require('./mongoUsers');
-const rutil = require ('./rutil');
-const cmds = require('./commands');
+const Discord = require('discord.js')
+const { MessageEmbed } = require('discord.js')
+const client = new Discord.Client()
+const auth = require('./auth.json')
+const mongoUser = require('./mongoUsers')
+const rutil = require('./rutil')
+const cmds = require('./commands')
 
 // 1 if in running without database for debug mode, 0 otherwise
-let NO_DB  = 0;
+let NO_DB = 0
 
 // get commandline arguments
-const args = process.argv.slice(2);
-if (args == "debug") {
-    rutil.warn(`RUNNING IN DEBUG MODE`);
-    NO_DB = 1;
+const args = process.argv.slice(2)
+if (args == 'debug') {
+  rutil.warn('RUNNING IN DEBUG MODE')
+  NO_DB = 1
 }
 
 // connect to database
 if (NO_DB == 0) {
-    mongoUser.connectDB().then((status) => {
-        if (status == `success`) {
-            rutil.log(`connectDB returned: ${status}`);
-        } else {
-            rutil.warn(`connectDB returned failure, shutting down`);
-            process.exit(1);
-        }
-    });
+  mongoUser.connectDB().then((status) => {
+    if (status == 'success') {
+      rutil.log(`connectDB returned: ${status}`)
+    } else {
+      rutil.warn('connectDB returned failure, shutting down')
+      process.exit(1)
+    }
+  })
 }
 
 /**
  * Output console log when bot is logged in.
  */
 client.on('ready', () => {
-    rutil.log(`Logged in as ${client.user.tag}!`);
-});
+  rutil.log(`Logged in as ${client.user.tag}!`)
+})
 
 /**
- * Claim a monster with heart reactions. Exit function immediately if message 
+ * Claim a monster with heart reactions. Exit function immediately if message
  * doesn't contain any embeds or read reaction isn't a type of heart. This is
- * because only embedded messages should be interactable and only hearts 
+ * because only embedded messages should be interactable and only hearts
  * reactions can be used to claim monsters.
  */
 client.on('messageReactionAdd', (reaction, user) => {
-    if (!reaction.message.embeds.length || !rutil.hearts.has(reaction.emoji.identifier)) return;
+  if (!reaction.message.embeds.length || !rutil.hearts.has(reaction.emoji.identifier)) return
 
-    rutil.log(`User ${user.username} claiming ${reaction.message.embeds[0].title}`);
-    cmds.claim(user.username, reaction.message.embeds[0].title, reaction.message);
-});
+  rutil.log(`User ${user.username} claiming ${reaction.message.embeds[0].title}`)
+  cmds.claim(user.username, reaction.message.embeds[0].title, reaction.message)
+})
 
 /**
  * Reply to all commands, this is an event listener.
  */
 client.on('message', msg => {
-    // Our bot needs to know if it will execute a command
-    // It will listen for messages that will start with `%`
-    if (msg.content.substring(0, 1) != '%') 
-        return;
-    let args = msg.content.substring(1).split(' ');
-    const cmd = args[0];
-    let now;
-    let reset;
-    let randomColor;
-    let embed;
-    
-    // argument for some commands
-    args = args.splice(1);
+  // Our bot needs to know if it will execute a command
+  // It will listen for messages that will start with `%`
+  if (msg.content.substring(0, 1) != '%') { return }
+  let args = msg.content.substring(1).split(' ')
+  const cmd = args[0]
+  let now
+  let reset
+  let randomColor
+  let embed
 
-    // user inputting command
-    const user = msg.author.username;
+  // argument for some commands
+  args = args.splice(1)
 
-    // commands:
-    if (NO_DB == 1) {
-        // don't check if the user is in the DB if we are running detatched from DB
-        msg.channel.send(`***WARNING:***  Executing command without Database! Some commands may not work.`);
-        cmds.exec(cmd, user, msg);
-    } else {
-        mongoUser.checkUser(user).then(() => {
-            cmds.exec(cmd, user, msg);
-        });
-    }
-});
+  // user inputting command
+  const user = msg.author.username
+
+  // commands:
+  if (NO_DB == 1) {
+    // don't check if the user is in the DB if we are running detatched from DB
+    msg.channel.send('***WARNING:***  Executing command without Database! Some commands may not work.')
+    cmds.exec(cmd, user, msg)
+  } else {
+    mongoUser.checkUser(user).then(() => {
+      cmds.exec(cmd, user, msg)
+    })
+  }
+})
 
 // login to the bot
-client.login(auth.token);
+client.login(auth.token)
 
 // shut down REMi
 process.on('SIGINT', () => {
-    rutil.warn(`\nSIGINT received! Shutting down REMi`);
-    mongoUser.mongo_client.close();
-    process.exit(0);
-});
+  rutil.warn('\nSIGINT received! Shutting down REMi')
+  mongoUser.mongo_client.close()
+  process.exit(0)
+})
 
 process.on('SIGTERM', () => {
-    rutil.warn(`\nSIGINT received! Shutting down REMi`);
-    mongoUser.mongo_client.close();
-    process.exit(0);
-});
-
+  rutil.warn('\nSIGINT received! Shutting down REMi')
+  mongoUser.mongo_client.close()
+  process.exit(0)
+})
