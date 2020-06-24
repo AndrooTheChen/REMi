@@ -43,10 +43,10 @@ function rollMonster () {
 }
 
 // Read in the monsters, segregate, and store
-const threeStarFile = 'monsters/threeStarDrops.txt'
-const fourStarFile = 'monsters/fourStarDrops.txt'
-const fiveStarFile = 'monsters/fiveStarDrops.txt'
-const fiveStarGodsFile = 'monsters/fiveStarGods.txt'
+const threeStarFile = 'monsters/three_star_drops.txt'
+const fourStarFile = 'monsters/four_star_drops.txt'
+const fiveStarFile = 'monsters/five_star_drops.txt'
+const fiveStarGodsFile = 'monsters/five_star_gods.txt'
 const GFEFile = 'monsters/GFE.txt'
 
 const readThreeStar = readline.createInterface({
