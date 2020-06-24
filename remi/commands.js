@@ -152,16 +152,16 @@ function exec (cmd, user, msg) {
  * Print the available REMi commands to user in Discord.
  * @param {parameter} msg User command and argument(s).
  */
-function help (msg) {
-  msg.channel.send('**%roll** - roll for a monster!\n' +
-                                '**%help** - list commands\n' +
-                                '**%monbox** - print your monster box\n' +
-                                '**%myrolls** - print your rolls.\n' +
-                                '**%myclaims** - print your claims.\n\n' +
-                                '__***FAQ***__\n' +
-                                'You have **60** seconds to claim a monster from when it is rolled.\n' +
-                                'You may roll up to **6** times every **45** minutes\n' +
-                                'You may claim up to **2** monsters every **45** minutes\n')
+function help ({ channel }) {
+  channel.send(`**%roll** - roll for a monster!
+**%help** - list commands
+**%monbox** - print your monster box
+**%myrolls** - print your rolls.
+**%myclaims** - print your claims.
+__***FAQ***__
+You have **60** seconds to claim a monster from when it is rolled.
+You may roll up to **6** times every **45** minutes
+You may claim up to **2** monsters every **45** minutes`)
 }
 
 /**
@@ -244,8 +244,8 @@ function claim (user, args, msg) {
           rutil.mlog(`CLAIM ERROR! ${args} not found in 'rolled' buffer.`)
           return
         }
-        msg.channel.send(`**${user}** claimed **${claimed.toString()}**!` +
-                                    `\nyou have **${numClaims - 1}** claim(s) remaining.`)
+        msg.channel.send(`**${user}** claimed **${claimed.toString()}**!
+        you have **${numClaims - 1}** claim(s) remaining.`)
         rutil.clog(`${user} claimed ${claimed}`)
 
         // update user's remaining claims
@@ -285,8 +285,8 @@ function claimid (user, args, msg) {
         if (claimed.toString() === 'FAILED') {
           msg.channel.send(`**__Error!__** ID ${args} is not a valid ID.`)
         } else {
-          msg.channel.send(`**${user}** claimed **${claimed.toString()}**!` +
-                                        `\nyou have **${numClaims - 1}** claim(s) remaining.`)
+          msg.channel.send(`**${user}** claimed **${claimed.toString()}**!
+          you have **${numClaims - 1}** claim(s) remaining.`)
           rutil.clog(`${user} claimed ${claimed}`)
         }
 
@@ -304,8 +304,8 @@ function claimid (user, args, msg) {
  */
 function monbox (user, msg) {
   mongoUser.printMonBox(user).then((monBox) => {
-    msg.channel.send(`**${user}'s**` +
-        ` monster box:\n${rutil.monPrint(monBox)}`)
+    msg.channel.send(`**${user}'s** monster box:
+    ${rutil.monPrint(monBox)}`)
   })
 }
 
