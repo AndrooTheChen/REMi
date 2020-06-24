@@ -20,17 +20,6 @@ const hearts = new Set(['%E2%9D%A4%EF%B8%8F' /* :heart: */,
   '%F0%9F%92%93' /* :heartbeat: */,
   '%F0%9F%92%97'])
 
-module.exports = {
-  clog,
-  err,
-  log,
-  monPrint,
-  mlog,
-  printTimeStamp,
-  warn,
-  hearts: hearts
-}
-
 /**
  * Convert date into readable format.
  * @param {Date} time
@@ -59,16 +48,9 @@ function getTimeStamp () {
  * Build the string to print a user's monster box.
  * @param {array} monBox List containing a user's monster box
  */
-function monPrint (monBox) {
-  let str = '```\n'
-
-  monBox.forEach((monster) => {
-    str = str + `${monster}\n`
-  })
-
-  str = str + '```'
-  return str
-}
+const monPrint = monBox => `\`\`\`
+${monBox.join('\n')}
+\`\`\``
 
 /**
  * Log the given message with a time stamp to the console.
@@ -110,4 +92,15 @@ function warn (msg) {
  */
 function err (msg) {
   console.log(`[${getTimeStamp()} ERROR] ${msg}`)
+}
+
+module.exports = {
+  clog,
+  err,
+  log,
+  monPrint,
+  mlog,
+  printTimeStamp,
+  warn,
+  hearts: hearts
 }
