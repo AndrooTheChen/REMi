@@ -121,14 +121,14 @@ function exec(cmd, user, msg) {
  
        // %rr - reset rolls
        case `rr`:
-           rutil.warn(`Resetting ${user} to 10 rolls`)
-           mongoUser.setRolls(user, 10);
+           rutil.warn(`Resetting ${user} to 6 rolls`)
+           mongoUser.setRolls(user, 6);
        break;
  
        // %rc - reset claims
        case `rc`:
-           rutil.warn(`Resetting ${user} to 3 claims`)
-           mongoUser.setClaims(user, 3);
+           rutil.warn(`Resetting ${user} to 2 claims`)
+           mongoUser.setClaims(user, 2);
        break;
 
        // %msg
@@ -166,7 +166,7 @@ function help(msg) {
 /**
  * Roll a monster for the user. First check that the user has
  * enough rolls. If this is the user's first roll (originally
- * had 10) make sure to record the time at which this happened
+ * had 6) make sure to record the time at which this happened
  * for refresh timer later. If the user has enough rolls, call
  * the roll function and return the monster's name. Also decrement
  * number of rolls if eligible.
@@ -185,7 +185,7 @@ function roll(user, msg) {
                 msg.channel.send(`Need to wait ${rutil.printTimeStamp(timeDiff)} for rolls to reset`);
             });
         } else {
-            if (numRolls == 10) {
+            if (numRolls == 6) {
                 // add timestamp for the first roll
                 mongoUser.addRollTimestamp(user);
             }
@@ -232,7 +232,7 @@ function claim(user, args, msg) {
                 msg.channel.send(`Need to wait ${rutil.printTimeStamp(timeDiff)} for claims to reset`);
             });
         } else {
-            if (numClaims == 3) {
+            if (numClaims == 2) {
                 // record the time for the user's first claim
                 mongoUser.addClaimTimestamp(user);
             }
@@ -310,7 +310,7 @@ function monbox(user, msg) {
 
 /**
  * Let users check how many rolls they have. If they have 0, print
- * how much time left until their number of rolls resets to 10.
+ * how much time left until their number of rolls resets to 6.
  * @param {string} user Username for user requesting info.
  * @param {parameter} msg User command and argument(s).
  */

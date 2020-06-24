@@ -20,7 +20,6 @@ function rollMonster() {
     const tier = Math.floor(Math.random() * 100) + 1;
     let drop;
 
-    console.log(tier);
     if (tier <= 10) {
         // 10% chance for 3*
         drop = three_star_drops[Math.floor(Math.random() * three_star_drops.length)];
