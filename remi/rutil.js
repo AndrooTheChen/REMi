@@ -38,8 +38,8 @@ function printTimeStamp (time) {
  * @return {string} current time stamp in readable format
  */
 function getTimeStamp () {
-  const {getUTCMonth, getUTCDay, getFullYear, getUTCHours, getUTCMinutes, getUTCSeconds} = new Date()
-  return `${getUTCMonth()}/${getUTCDay()}/${getFullYear()} ${getUTCHours()}:${getUTCMinutes()}:${getUTCSeconds()}`
+  const date = new Date()
+  return `${date.getUTCMonth()}/${date.getUTCDay()}/${date.getFullYear()} ${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}`
 }
 
 /**
