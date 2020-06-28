@@ -122,14 +122,14 @@ function exec (cmd, user, msg) {
 
       // %rr - reset rolls
     case 'rr':
-      rutil.warn(`Resetting ${user} to 10 rolls`)
-      mongoUser.setRolls(user, 10)
+      rutil.warn(`Resetting ${user} to 6 rolls`)
+      mongoUser.setRolls(user, 6)
       break
 
       // %rc - reset claims
     case 'rc':
-      rutil.warn(`Resetting ${user} to 3 claims`)
-      mongoUser.setClaims(user, 3)
+      rutil.warn(`Resetting ${user} to 2 claims`)
+      mongoUser.setClaims(user, 2)
       break
 
       // %msg
@@ -186,7 +186,7 @@ function roll (user, msg) {
         msg.channel.send(`Need to wait ${rutil.printTimeStamp(timeDiff)} for rolls to reset`)
       })
     } else {
-      if (numRolls === 10) {
+      if (numRolls === 6) {
         // add timestamp for the first roll
         mongoUser.addRollTimestamp(user)
       }
@@ -233,7 +233,7 @@ function claim (user, args, msg) {
         msg.channel.send(`Need to wait ${rutil.printTimeStamp(timeDiff)} for claims to reset`)
       })
     } else {
-      if (numClaims === 3) {
+      if (numClaims === 2) {
         // record the time for the user's first claim
         mongoUser.addClaimTimestamp(user)
       }
@@ -275,7 +275,7 @@ function claimid (user, args, msg) {
         msg.channel.send(`Need to wait ${rutil.printTimeStamp(timeDiff)} for claims to reset`)
       })
     } else {
-      if (numClaims === 3) {
+      if (numClaims === 2) {
         // record the time for the user's first claim
         mongoUser.addClaimTimestamp(user)
       }
@@ -331,7 +331,7 @@ function myrolls (user, msg) {
 
 /**
  * Let users check how many claims they have. If they have 0, print
- * how much time left until their number of claims resets to 3.
+ * how much time left until their number of claims resets to 2.
  * @param {string} user Username for user requesting info.
  * @param {parameter} msg User command and argument(s).
  */

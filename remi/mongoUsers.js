@@ -188,7 +188,7 @@ async function checkUser (user) {
       const claimPromise = getClaimTimestamp(user).then((firstClaimTime) => {
         if (timeToReset(firstClaimTime) === true) {
           setClaims(user, 2)
-          rutil.mlog(`Resetting ${user}'s claims to 3`)
+          rutil.mlog(`Resetting ${user}'s claims to 2`)
         }
       })
 
