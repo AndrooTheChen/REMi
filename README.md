@@ -1,22 +1,14 @@
 # REMi
-Discord bot to emulate the Rare Egg Machine gacha from mobile game Puzzle & Dragons.  
+API server for a Discord bot to emulate the Rare Egg Machine gacha from the mobile game Puzzle & Dragons.  
 
-Run with:  
-```
-$ npm install
-```
-and  
-```
-$ node remi/remi.js
-```
-  
-    
- *Optionally run without database with*
- ```
- $ node remi/remi.js debug
- ```
+## Setup 
+To install dependencies run `npm install` at the root of this repository.
 
-## Cmds (WIP)
+To deploy the API server, use the command `npm run deploy`. Alternatively, deploy the server without access to the database using `npm run debug`.
+
+To lint the codebase before contributing, use the command `npm run lint`. To force rewrite files to match lint specifications, use the command `npm run clean`.
+
+## Supported Commands (WIP)
 
 **%roll** - roll for a monster!  
 **%monbox** - print monster box of collected monsters  
@@ -24,10 +16,9 @@ $ node remi/remi.js
 **%myclaims** - see how many claims you have left  
 **%help** - list all commands  
 
-## Files
+## Repository Structure
 remi/ - main driver code  
-monsters/ - <key, value> pairs of URLs and monsters scraped with PADx scraper loaded in when running  
+monsters/ - <key, value> pairs of URLs and monsters scraped with PADx scraper which is loaded on runtime.
 resources/ - misc. folder for other REMi resources  
 deprecated/ - older files used for testing  
 Dashboard/ - front-end dashboard for users to view their monsters in a browser (WIP 06/20)
-
