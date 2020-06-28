@@ -167,7 +167,7 @@ You may claim up to **2** monsters every **45** minutes`)
 /**
  * Roll a monster for the user. First check that the user has
  * enough rolls. If this is the user's first roll (originally
- * had 10) make sure to record the time at which this happened
+ * had 6) make sure to record the time at which this happened
  * for refresh timer later. If the user has enough rolls, call
  * the roll function and return the monster's name. Also decrement
  * number of rolls if eligible.
@@ -311,7 +311,7 @@ function monbox (user, msg) {
 
 /**
  * Let users check how many rolls they have. If they have 0, print
- * how much time left until their number of rolls resets to 10.
+ * how much time left until their number of rolls resets to 6.
  * @param {string} user Username for user requesting info.
  * @param {parameter} msg User command and argument(s).
  */
