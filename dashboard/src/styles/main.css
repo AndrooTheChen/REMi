@@ -37,45 +37,16 @@ body
     box-shadow: none;
 }
 
-.floatl{
-    float : left;
-}
-
-.floatr{
-    float : right;
-}
-
-.textcenter{
-    text-align : center;
-}
-
-.form-control{
-    width: 65%;
-}
-
-#topleft {
-    float : left;
-    margin-right : auto;
-    margin-bottom : auto;
-    max-width : 50%;
-}
-
-#topright {
-    float : right;
-    margin-left: auto;
-    margin-bottom : auto;
-    max-width : 50%;
-    align-content: right;
-}
-
 .welcome-title {
     margin-top: auto;
     margin-bottom: auto;
     padding: 10px;
+    text-align: center;
 }
 
-#About {
+#AboutText {
     float: left;
+    text-align: center;
     margin-right: auto;
     margin-bottom: auto;
     width: 60%;
@@ -101,11 +72,15 @@ img {
 }
 
 @media (min-width:150px) and (max-width:780px) {
-    #About {
+    #AboutText {
         float: none;
         margin: auto;
         padding: 15px;
         width:100%;
+        
+    }
+    
+    #About {
         display: flex;
         flex-direction: column-reverse;
     }
@@ -115,7 +90,7 @@ img {
         margin: auto;
         padding: 15px;
         width:80%;
-        
+
     }
 
     
