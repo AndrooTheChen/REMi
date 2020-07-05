@@ -8,13 +8,13 @@ const Leaderboard = () => {
     <>
         <div class="welcome-title">
             <h1>Leaderboard</h1>
-            <h4>Rare Egg Machine Bot</h4>
+            <h4>for REMi</h4>
+            
         </div>
-        <div id = "About">
-            <div id = "AboutText">
-                <h3>Input stuff</h3>
-                <p>Stuff</p>
-            </div>
+        
+        <div class = "MainContent">
+            <h2>Users</h2>
+            <hr/>
         </div>
     </>
   );

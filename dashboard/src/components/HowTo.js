@@ -4,18 +4,28 @@ import "../styles/main.css";
 import remImage from "../REMi-Image2.png";
 
 const HowTo = () => {
+    
   return (
     <>
         <div class="welcome-title">
-            <h1>Commands</h1>
-            <h4>Rare Egg Machine Bot</h4>
+            <h1>How To</h1>
+            <h4>All you need to know to use REMi!</h4>
+            
         </div>
-        <div id = "About">
-            <div id = "AboutText">
-                <h3>Input stuff</h3>
-                <p>Stuff</p>
-            </div>
-        </div></>
+        
+        <div class = "MainContent">
+            <h2>Commands</h2>
+            <hr/>
+            <p>%roll - roll for a monster!  </p>
+            <p>%monbox - print monster box of collected monsters </p> 
+            <p>%myrolls - see how many rolls you have left  </p>
+            <p>%myclaims - see how many claims you have left </p>
+            <p>%help - list all commands  </p>
+            <br/>
+            <h2>Examples</h2>
+            <hr/>
+        </div>
+    </>
   );
 };
 export default HowTo;
