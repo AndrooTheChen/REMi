@@ -7,17 +7,24 @@ const mongoUser = require('./mongoUsers')
 const rutil = require('./rutil')
 const cmds = require('./commands')
 
-// 1 if in running without database for debug mode, 0 otherwise
+// 1 if running without database for debug mode, 0 otherwise
 let NO_DB = 0
 
+// 1 if running remote connection to DB
+let REMOTE_DB = 0 
+
 // get commandline arguments
-const args = process.argv.slice(2)
+const args = process.argv.slice(2)[0]
 if (args === 'debug') {
   rutil.warn('RUNNING IN DEBUG MODE')
   NO_DB = 1
+} else if (args === 'pemi') {
+  rutil.warn('RUNNING REMOTE CONNECTION TO REMIDB')
+  REMOTE_DB = 1;
 }
 
 // connect to database
+mongoUser.setUp(REMOTE_DB)
 if (NO_DB === 0) {
   mongoUser.connectDB().then((status) => {
     if (status === 'success') {
@@ -83,12 +90,12 @@ client.login(auth.token)
 // shut down REMi
 process.on('SIGINT', () => {
   rutil.warn('\nSIGINT received! Shutting down REMi')
-  mongoUser.mongo_client.close()
+  mongoUser.shutdown()
   process.exit(0)
 })
 
 process.on('SIGTERM', () => {
   rutil.warn('\nSIGINT received! Shutting down REMi')
-  mongoUser.mongo_client.close()
+  mongoUser.shutdown()
   process.exit(0)
 })

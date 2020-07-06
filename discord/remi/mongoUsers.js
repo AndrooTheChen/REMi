@@ -1,15 +1,25 @@
 // mongoUsers.js
 // =============
 const rutil = require('./rutil')
+const dbauth = require('./dbauth')
 
 // connect to DB
 const { MongoClient } = require('mongodb')
-const uri = 'mongodb://localhost:27017'
-const mongoClient = new MongoClient(uri, { useUnifiedTopology: true })
+let mongoClient;
 let db
 
 // current claim ID cycles 0-999
 let claimId = 0
+
+/**
+ * This function allows us to either connecto the database running
+ * on localhost or remotely using ngrok
+ * @param {bool} isRemote boolean telling us to if we are connecint remotely
+ */
+function setUp(isRemote) {
+  const uri = (isRemote) ? dbauth.uri : 'mongodb://localhost:27017'
+  mongoClient = new MongoClient(uri, { useUnifiedTopology: true })
+}
 
 /**
  * DEBUG
@@ -400,6 +410,13 @@ async function disenchantFromBuffer (user, roll) {
   }
 }
 
+/**
+ * Close of connection to database
+ */
+function shutdown() {
+  mongoClient.close();
+}
+
 module.exports = {
   addClaimTimestamp,
   addRollTimestamp,
@@ -418,5 +435,7 @@ module.exports = {
   printUsers,
   setClaims,
   setRolls,
+  setUp,
+  shutdown,
   mongo_client: mongoClient
 }
