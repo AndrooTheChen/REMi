@@ -5,7 +5,7 @@ const dbauth = require('./dbauth')
 
 // connect to DB
 const { MongoClient } = require('mongodb')
-let mongoClient;
+let mongoClient
 let db
 
 // current claim ID cycles 0-999
@@ -16,7 +16,7 @@ let claimId = 0
  * on localhost or remotely using ngrok
  * @param {bool} isRemote boolean telling us to if we are connecint remotely
  */
-function setUp(isRemote) {
+function setUp (isRemote) {
   const uri = (isRemote) ? dbauth.uri : 'mongodb://localhost:27017'
   mongoClient = new MongoClient(uri, { useUnifiedTopology: true })
 }
@@ -413,8 +413,8 @@ async function disenchantFromBuffer (user, roll) {
 /**
  * Close of connection to database
  */
-function shutdown() {
-  mongoClient.close();
+function shutdown () {
+  mongoClient.close()
 }
 
 module.exports = {
