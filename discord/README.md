@@ -4,7 +4,7 @@ API server for a Discord bot to emulate the Rare Egg Machine gacha from the mobi
 ## Setup 
 To install dependencies run `npm install` at the root of this repository.
 
-To deploy the API server, use the command `npm run deploy`. Alternatively, deploy the server without access to the database using `npm run debug`. Lastly, deploy the server given a secure ngrok link in a `dbauth.json` "uri" field by using `npm run pemi`.
+To deploy the API server, use the command `npm run deploy`. Alternatively, deploy the server without access to the database using `npm run debug`. Lastly, deploy the server given a secure ngrok link in a `dbauth.json` "uri" field by using `npm run deploy pemi`.
 
 To lint the codebase before contributing, use the command `npm run lint`. To force rewrite files to match lint specifications, use the command `npm run clean`.
 
