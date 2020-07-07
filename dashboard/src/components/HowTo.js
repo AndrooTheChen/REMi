@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "../styles/main.css";
-import remImage from "../REMi-Image2.png";
 
 const HowTo = () => {
     
@@ -17,7 +16,7 @@ const HowTo = () => {
             <h2>Commands</h2>
             <hr/>
             <p>%roll - roll for a monster!  </p>
-            <p>%monbox - print monster box of collected monsters </p> 
+            <p>%monbox - print monster box of collected monsters </p>
             <p>%myrolls - see how many rolls you have left  </p>
             <p>%myclaims - see how many claims you have left </p>
             <p>%help - list all commands  </p>

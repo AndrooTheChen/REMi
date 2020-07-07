@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "../styles/main.css";
-import remImage from "../REMi-Image2.png";
 
 const Leaderboard = () => {
   return (
