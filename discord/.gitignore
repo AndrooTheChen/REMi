@@ -1,5 +1,6 @@
 auth.json
 node_modules
 dump
+dbauth.json
 remiDB_backup
 .eslintrc.json
