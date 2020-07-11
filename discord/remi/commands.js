@@ -47,7 +47,7 @@ function exec (cmd, user, msg) {
 
       // %roll
     case 'roll':
-    case 'r':
+    case 'reaction':
       roll(user, msg)
       break
 
@@ -330,17 +330,17 @@ function monbox (user, msg) {
         const nextFilter = (reaction, user) => reaction.emoji.name === '➡' && user.id !== msg.author.id
         const prevCollector = msg.createReactionCollector(prevFilter, { time: 30000 })
         const nextCollector = msg.createReactionCollector(nextFilter, { time: 30000 })
-        prevCollector.on('collect', (r, u) => {
+        prevCollector.on('collect', (reaction, user) => {
           if (curpage === 1) return
           curpage -= 1
-          msg.edit(`**${u}'s** monster box: ${rutil.monPrint(monBox,curpage)}`)
-          rutil.log(`Collected ${r.emoji.name} from ${u.tag}`)
+          msg.edit(`**${user}'s** monster box: ${rutil.monPrint(monBox,curpage)}`)
+          rutil.log(`Collected ${reaction.emoji.name} from ${user.tag}`)
         })
-        nextCollector.on('collect', (r, u) => {
+        nextCollector.on('collect', (reaction, user) => {
           if (curpage === lastpage) return
           curpage += 1
-          msg.edit(`**${u}'s** monster box: ${rutil.monPrint(monBox,curpage)}`)
-          rutil.log(`Collected ${r.emoji.name} from ${u.tag}`)
+          msg.edit(`**${user}'s** monster box: ${rutil.monPrint(monBox,curpage)}`)
+          rutil.log(`Collected ${reaction.emoji.name} from ${user.tag}`)
         })
         prevCollector.on('end', () => rutil.log(`${user}'s monster box page timed out.`))
       }).catch(function (){
