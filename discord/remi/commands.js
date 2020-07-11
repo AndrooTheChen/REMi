@@ -304,8 +304,49 @@ function claimid (user, args, msg) {
  */
 function monbox (user, msg) {
   mongoUser.printMonBox(user).then((monBox) => {
-    msg.channel.send(`**${user}'s** monster box:
-    ${rutil.monPrint(monBox)}`)
+
+    // sets curpage as the first argument after cmd
+    // sets lastpage as last page possible of monBox
+    const arguments = msg.content.split(' ').slice(start=1)
+    let curpage = (arguments.length===0)? 1 : +arguments[0]
+    const lastpage = Math.floor((monBox.length-1)/10) + 1
+
+    //sort monster box alphabetically (may give options later)
+    monBox.sort()
+    
+    //check curpage as viable
+    if (!Number.isInteger(curpage) || curpage < 1 || curpage > lastpage ) {
+      msg.channel.send('```Invalid arguments for monster box.```')
+    } else {
+
+      //message
+      const m = msg.channel.send(`**${user}'s** monster box: ${rutil.monPrint(monBox,curpage)}`)
+      .then(function (msg){
+        msg.react('⬅')
+        msg.react('➡')
+
+        //reaction collector
+        const prevFilter = (reaction, user) => reaction.emoji.name === '⬅' && user.id !== msg.author.id
+        const nextFilter = (reaction, user) => reaction.emoji.name === '➡' && user.id !== msg.author.id
+        const prevCollector = msg.createReactionCollector(prevFilter, { time: 30000 })
+        const nextCollector = msg.createReactionCollector(nextFilter, { time: 30000 })
+        prevCollector.on('collect', (r, u) => {
+          if (curpage === 1) return
+          curpage -= 1
+          msg.edit(`**${u}'s** monster box: ${rutil.monPrint(monBox,curpage)}`)
+          rutil.log(`Collected ${r.emoji.name} from ${u.tag}`)
+        })
+        nextCollector.on('collect', (r, u) => {
+          if (curpage === lastpage) return
+          curpage += 1
+          msg.edit(`**${u}'s** monster box: ${rutil.monPrint(monBox,curpage)}`)
+          rutil.log(`Collected ${r.emoji.name} from ${u.tag}`)
+        })
+        prevCollector.on('end', () => rutil.log(`${user}'s monster box page timed out.`))
+      }).catch(function (){
+        rutil.log('Failed to print monster box page.')
+      })
+    }
   })
 }
 
