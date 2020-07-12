@@ -2,11 +2,13 @@
 // =============
 const rutil = require('./rutil')
 const dbauth = require('./dbauth')
+const mongoActions = require('./mongoActions')
+const mongoUtil = require('./mongoUtil')
 
 // connect to DB
 const { MongoClient } = require('mongodb')
 let mongoClient
-let db
+// let db = mongoUtil.getDb()
 
 // current claim ID cycles 0-999
 let claimId = 0
@@ -28,7 +30,7 @@ function setUp (isRemote) {
  */
 function printCollections () {
   const db = mongoClient.db('remiDB')
-  db.listCollections().toArray(function (err, results) {
+  mongoUtil.getDb().listCollections().toArray(function (err, results) {
     if (err) return console.log(err)
     if (results.length === 0) console.log('no collections')
     else console.log('printing collections')
@@ -42,8 +44,7 @@ function printCollections () {
  * entries in the "users" collection in remiDB.
  */
 function printUsers () {
-  const db = mongoClient.db('remiDB')
-  db.collection('users').find().toArray(function (err, docs) {
+  mongoUtil.getDb().collection('users').find().toArray(function (err, docs) {
     if (err) return console.log(err)
     console.log(`${JSON.stringify(docs)}\n`)
   })
@@ -55,8 +56,7 @@ function printUsers () {
  * entries in the "users" collection in remiDB.
  */
 function printRolled () {
-  const db = mongoClient.db('remiDB')
-  db.collection('rolled').find().toArray(function (err, docs) {
+  mongoUtil.getDb().collection('rolled').find().toArray(function (err, docs) {
     if (err) return console.log(err)
     console.log(JSON.stringify(docs))
   })
@@ -98,7 +98,7 @@ async function connectDB () {
 async function checkRolls (user) {
   rutil.mlog(`checking ${user}'s rolls`)
   try {
-    const users = db.collection('users')
+    const users = mongoUtil.getDb().collection('users')
     const { numRolls } = await users.findOne({ username: user })
     return numRolls
   } catch (ex) {
@@ -109,7 +109,7 @@ async function checkRolls (user) {
 
 function setRolls (user, numRolls) {
   rutil.mlog(`Setting ${user}'s number of rolls to ${numRolls}`)
-  const users = db.collection('users')
+  const users = mongoUtil.getDb().collection('users')
   return users.updateOne({ username: user }, { $set: { numRolls: numRolls } })
 }
 
@@ -122,7 +122,7 @@ function setRolls (user, numRolls) {
 async function checkClaims (user) {
   rutil.mlog(`checking ${user}'s claims`)
   try {
-    const users = db.collection('users')
+    const users = mongoUtil.getDb().collection('users')
     const { numClaims } = await users.findOne({ username: user })
     return numClaims
   } catch (ex) {
@@ -138,7 +138,7 @@ async function checkClaims (user) {
  */
 function setClaims (user, numClaims) {
   rutil.mlog(`Setting ${user}'s claims to ${numClaims}`)
-  const users = db.collection('users')
+  const users = mongoUtil.getDb().collection('users')
   return users.updateOne({ username: user }, { $set: { numClaims: numClaims } })
 }
 
@@ -165,7 +165,9 @@ function timeToReset (time) {
  * @param {string} user Username for user requesting info
  */
 async function checkUser (user) {
-  const users = db.collection('users')
+  // const users = mongoUtil.getDb().collection('users')
+  const db = mongoUtil.getDb()
+  const users = mongoUtil.getDb().collection('users')
 
   // verify user exists in collection
   return users.findOne({ username: user }).then((result) => {
@@ -217,7 +219,7 @@ async function checkUser (user) {
  * @param {string} name Name of the monster to claim
  */
 function claimMonster (user, name) {
-  const rolled = db.collection('rolled')
+  const rolled = mongoUtil.getDb().collection('rolled')
 
   // return a promise to search for desired monster in active rolled collection
   return rolled.findOne({ monName: name }).then((result) => {
@@ -246,7 +248,7 @@ function claimMonster (user, name) {
  * @param {string} name Name of the monster to claim
  */
 function claimMonsterById (user, id) {
-  const rolled = db.collection('rolled')
+  const rolled = mongoUtil.getDb().collection('rolled')
 
   // return a promise to search for desired monster in active rolled collection
   return rolled.findOne({ claimId: id.toString() }).then((result) => {
@@ -271,7 +273,7 @@ function claimMonsterById (user, id) {
  * @param {string} user Username for user requesting info
  */
 function printMonBox (user) {
-  const users = db.collection('users')
+  const users = mongoUtil.getDb().collection('users')
 
   return users.findOne({ username: user }).then((userEntry) => {
     return userEntry.monBox
@@ -284,7 +286,7 @@ function printMonBox (user) {
  * @param {string} monName
  */
 async function addMonsterToBoxById (user, monName) {
-  const users = db.collection('users')
+  const users = mongoUtil.getDb().collection('users')
 
   // add specified monster to users's monster box
   await users.updateOne({ username: user }, { $addToSet: { monBox: monName.toString() } })
@@ -296,7 +298,7 @@ async function addMonsterToBoxById (user, monName) {
  * @param {string} user
  */
 async function addClaimTimestamp (user) {
-  const users = db.collection('users')
+  const users = mongoUtil.getDb().collection('users')
 
   await users.updateOne({ username: user }, { $set: { firstClaimTime: new Date() } })
 }
@@ -306,7 +308,7 @@ async function addClaimTimestamp (user) {
  * @param {string} user Username for user requesting info
  */
 function getClaimTimestamp (user) {
-  const users = db.collection('users')
+  const users = mongoUtil.getDb().collection('users')
 
   // return firstClaimTime field for specified user
   return users.findOne({ username: user }).then((userEntry) => {
@@ -319,7 +321,7 @@ function getClaimTimestamp (user) {
  * @param {string} user Username for user requesting info
  */
 async function addRollTimestamp (user) {
-  const users = db.collection('users')
+  const users = mongoUtil.getDb().collection('users')
 
   // add timestamp of user's first roll below max amount
   await users.updateOne({ username: user }, { $set: { firstRollTime: new Date() } })
@@ -330,7 +332,7 @@ async function addRollTimestamp (user) {
  * @param {string} user Username for user requesting info
  */
 function getRollTimestamp (user) {
-  const users = db.collection('users')
+  const users = mongoUtil.getDb().collection('users')
 
   // return firstRollTime field for specified user
   return users.findOne({ username: user }).then((userEntry) => {
@@ -347,7 +349,7 @@ function getRollTimestamp (user) {
  * @param {string} url Monster image URL
  */
 async function addRollToBuffer (user, roll) {
-  const rolled = db.collection('rolled')
+  const rolled = mongoUtil.getDb().collection('rolled')
   await rolled.insertOne({
     claimId: claimId.toString(),
     monName: roll.name,
@@ -374,11 +376,11 @@ async function addRollToBuffer (user, roll) {
  * @param {Object} roll Contains monster name, URL, and rarity
  */
 async function disenchantFromBuffer (user, roll) {
-  const rolled = db.collection('rolled')
+  const rolled = mongoUtil.getDb().collection('rolled')
   const deleted = await rolled.deleteOne({ rolledBy: user, monName: roll.name })
 
   if (deleted.deletedCount) {
-    const users = db.collection('users')
+    const users = mongoUtil.getDb().collection('users')
     rutil.mlog(`Removed ${roll.name} rolled by ${user} due to timeout`)
     rutil.mlog('Monster expired, disenchanting...')
 
@@ -417,68 +419,9 @@ function shutdown () {
   mongoClient.close()
 }
 
-async function testAdd (user, monster) {
-  const users = db.collection('users')
-
-  // add specified monster to users's monster box
-
-  const entry = {name: monster.toString(), qty: 1}
-  await users.updateOne({ username: user }, { $addToSet: { monBox: entry } })
-  rutil.mlog(`Successfully inserted ${monster.toString()} in ${user}'s monster box`) 
-}
-
-async function testFind(user, monster) {
-  const users = db.collection('users')
-  
-  const query = { username: user, "monBox.name": monster, "monBox.qty": {$gte: 0}}
-  return users.findOne(query).then((result) => {
-    if (result == null) {
-      rutil.err(`${monster} was not found`)
-    } else {
-      console.log(result.monBox.find(monName => monName.name === monster))
-    }
-  })
-}
-
-async function testIncrement (user, monster) {
-  const users = db.collection('users')
-  const query = { username: user, "monBox.name": monster}
-  const update_query = { $inc: {"monBox.$.qty": 1} }
-
-  try {
-    users.updateOne(query, update_query)
-  } catch (ex) {
-    rutil.err(ex)
-  }
-}
-
-async function testDecrement (user, monster) {
-  const users = db.collection('users')
-  const query = { username: user, "monBox.name": monster }
-  const dec_query = { $inc: { "monBox.$.qty": -1 }}
-
-  try {
-    users.updateOne(query, dec_query)
-  } catch (ex) {
-    rutil.err(ex)
-  }
-}
-
-async function testDelete (user, monster) {
-  const users = db.collection('users')
-  const query = { username: user }
-  console.log(user)
-  const delete_query = { $pull: { monBox: { name: monster } } }
-
-  try {
-    users.updateOne(query, delete_query)
-  } catch (ex) {
-    rutil.err(ex)
-  }
-}
 
 async function clearMonBox (user) {
-  const users = db.collection('users')
+  const users = mongoUtil.getDb().collection('users')
 
   await users.updateOne({ username: user}, { $set: { monBox: [] } })
   rutil.mlog(`Successfully cleared ${user}'s monster box`) 
@@ -505,10 +448,5 @@ module.exports = {
   setRolls,
   setUp,
   shutdown,
-  testAdd,
-  testFind,
-  testIncrement,
-  testDecrement,
-  testDelete,
   mongo_client: mongoClient
 }
