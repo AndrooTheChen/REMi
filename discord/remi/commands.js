@@ -109,17 +109,26 @@ function exec (cmd, user, msg) {
 
      // testAdd 
     case 'ta':
-      mongoUser.testAdd(user, msg)
+      mongoUser.testAdd(user, msg.content.slice([4]))
       break
 
      // testFind
     case 'tf':
-      mongoUser.testFind(user, msg)
+      mongoUser.testFind(user, msg.content.slice([4]))
       break
 
     // testUpdate
-    case 'tu':
-      mongoUser.testUpdate(user)
+    case 'tinc':
+      mongoUser.testIncrement(user, msg.content.slice([6]))
+      break
+
+    case 'tdec':
+      mongoUser.testDecrement(user, msg.content.slice([6]))
+      break
+
+    // testDelete
+    case 'td':
+      mongoUser.testDelete(user, msg.content.slice([4]))
       break
 
     // clearMonBox

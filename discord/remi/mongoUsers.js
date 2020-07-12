@@ -421,35 +421,60 @@ async function testAdd (user, monster) {
   const users = db.collection('users')
 
   // add specified monster to users's monster box
-  console.log(Object.getOwnPropertyNames(monster))
-  console.log(Object.getOwnPropertyNames(monster.toString))
-  console.log(monster.toString().name)
-  console.log(monster)
-  // entry = {name: monster.toString(), qty: 1}
-  // await users.updateOne({ username: user }, { $addToSet: { monBox: entry } })
-  // rutil.mlog(`Successfully inserted ${monster.toString()} in ${user}'s monster box`) 
+
+  const entry = {name: monster.toString(), qty: 1}
+  await users.updateOne({ username: user }, { $addToSet: { monBox: entry } })
+  rutil.mlog(`Successfully inserted ${monster.toString()} in ${user}'s monster box`) 
 }
 
 async function testFind(user, monster) {
   const users = db.collection('users')
   
-  // query = { username: user, monBox: { name: monName, qty: 1 } }
-  query = { username: user, "monBox.name": monster, "monBox.qty": {$gte: 0}}
+  const query = { username: user, "monBox.name": monster, "monBox.qty": {$gte: 0}}
   return users.findOne(query).then((result) => {
     if (result == null) {
-      console.log("fail")
+      rutil.err(`${monster} was not found`)
     } else {
-      console.log(result.monBox)
+      console.log(result.monBox.find(monName => monName.name === monster))
     }
   })
 }
 
-async function testUpdate (user, monster) {
+async function testIncrement (user, monster) {
   const users = db.collection('users')
+  const query = { username: user, "monBox.name": monster}
+  const update_query = { $inc: {"monBox.$.qty": 1} }
 
-  query = { username: user, "monBox.qty": {$gte: 0}}
-  update_query = { $inc: {"monBox.qty": 1} }
-  users.updateOne(query, update_query)
+  try {
+    users.updateOne(query, update_query)
+  } catch (ex) {
+    rutil.err(ex)
+  }
+}
+
+async function testDecrement (user, monster) {
+  const users = db.collection('users')
+  const query = { username: user, "monBox.name": monster }
+  const dec_query = { $inc: { "monBox.$.qty": -1 }}
+
+  try {
+    users.updateOne(query, dec_query)
+  } catch (ex) {
+    rutil.err(ex)
+  }
+}
+
+async function testDelete (user, monster) {
+  const users = db.collection('users')
+  const query = { username: user }
+  console.log(user)
+  const delete_query = { $pull: { monBox: { name: monster } } }
+
+  try {
+    users.updateOne(query, delete_query)
+  } catch (ex) {
+    rutil.err(ex)
+  }
 }
 
 async function clearMonBox (user) {
@@ -482,6 +507,8 @@ module.exports = {
   shutdown,
   testAdd,
   testFind,
-  testUpdate,
+  testIncrement,
+  testDecrement,
+  testDelete,
   mongo_client: mongoClient
 }
