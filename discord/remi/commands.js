@@ -105,7 +105,26 @@ function exec (cmd, user, msg) {
         rutil.log(`Time diff: ${diff}`)
         msg.channel.send(`Time since last roll: ${rutil.printTimeStamp(diff)}`)
       })
+      break
 
+     // testAdd 
+    case 'ta':
+      mongoUser.testAdd(user, msg)
+      break
+
+     // testFind
+    case 'tf':
+      mongoUser.testFind(user, msg)
+      break
+
+    // testUpdate
+    case 'tu':
+      mongoUser.testUpdate(user)
+      break
+
+    // clearMonBox
+    case 'cmb':
+      mongoUser.clearMonBox(user)
       break
 
       // %timediff

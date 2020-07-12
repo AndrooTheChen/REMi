@@ -32,7 +32,7 @@ function printCollections () {
     if (err) return console.log(err)
     if (results.length === 0) console.log('no collections')
     else console.log('printing collections')
-    console.log(JSON.stringify(results))
+    console.log(`${JSON.stringify(results)}\n\n`)
   })
 }
 
@@ -45,7 +45,7 @@ function printUsers () {
   const db = mongoClient.db('remiDB')
   db.collection('users').find().toArray(function (err, docs) {
     if (err) return console.log(err)
-    console.log(JSON.stringify(docs))
+    console.log(`${JSON.stringify(docs)}\n`)
   })
 }
 
@@ -417,6 +417,48 @@ function shutdown () {
   mongoClient.close()
 }
 
+async function testAdd (user, monster) {
+  const users = db.collection('users')
+
+  // add specified monster to users's monster box
+  console.log(Object.getOwnPropertyNames(monster))
+  console.log(Object.getOwnPropertyNames(monster.toString))
+  console.log(monster.toString().name)
+  console.log(monster)
+  // entry = {name: monster.toString(), qty: 1}
+  // await users.updateOne({ username: user }, { $addToSet: { monBox: entry } })
+  // rutil.mlog(`Successfully inserted ${monster.toString()} in ${user}'s monster box`) 
+}
+
+async function testFind(user, monster) {
+  const users = db.collection('users')
+  
+  // query = { username: user, monBox: { name: monName, qty: 1 } }
+  query = { username: user, "monBox.name": monster, "monBox.qty": {$gte: 0}}
+  return users.findOne(query).then((result) => {
+    if (result == null) {
+      console.log("fail")
+    } else {
+      console.log(result.monBox)
+    }
+  })
+}
+
+async function testUpdate (user, monster) {
+  const users = db.collection('users')
+
+  query = { username: user, "monBox.qty": {$gte: 0}}
+  update_query = { $inc: {"monBox.qty": 1} }
+  users.updateOne(query, update_query)
+}
+
+async function clearMonBox (user) {
+  const users = db.collection('users')
+
+  await users.updateOne({ username: user}, { $set: { monBox: [] } })
+  rutil.mlog(`Successfully cleared ${user}'s monster box`) 
+}
+
 module.exports = {
   addClaimTimestamp,
   addRollTimestamp,
@@ -426,6 +468,7 @@ module.exports = {
   checkClaims,
   claimMonster,
   claimMonsterById,
+  clearMonBox,
   connectDB,
   getClaimTimestamp,
   getRollTimestamp,
@@ -437,5 +480,8 @@ module.exports = {
   setRolls,
   setUp,
   shutdown,
+  testAdd,
+  testFind,
+  testUpdate,
   mongo_client: mongoClient
 }
