@@ -46,17 +46,13 @@ function getTimeStamp () {
  * Build the string to print a user's monster box.
  * @param {array} monBox List containing a user's monster box
  */
-// const monPrint = monBox => `\`\`\`
-// ${monBox.join('\n')}
-// \`\`\``
-
-function monPrint(monBox) {
-  let output = `\`\`\``
-  monBox.forEach( (obj) => {
+function monPrint (monBox) {
+  let output = '```'
+  monBox.forEach((obj) => {
     output += `Own: ${obj.qty} | ${obj.name}\n`
     console.log(output)
   })
-  output += '\n\`\`\`'
+  output += '\n```'
   return output
 }
 

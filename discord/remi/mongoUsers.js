@@ -2,6 +2,7 @@
 // =============
 const rutil = require('./rutil')
 const mongoUtil = require('./mongoUtil')
+const mongoBox = require('./mongoBox')
 
 // current claim ID cycles 0-999
 let claimId = 0
@@ -185,7 +186,15 @@ function claimMonster (user, name) {
       return 'FAILED'
     } else {
       // add monster to user's monster box in user collection
-      addMonsterToBoxById(user, result.monName)
+      mongoBox.find(user, result.monName).then((inBox) => {
+        if (inBox === null) {
+          // first time getting this monster, add to monster box
+          mongoBox.add(user, result.monName)
+        } else {
+          // increment qty of this monster
+          mongoBox.update(user, result.monName, 1)
+        }
+      })
 
       // remove monster from active collection
       rolled.deleteOne({ rolledBy: user, monName: name })
@@ -370,8 +379,8 @@ async function disenchantFromBuffer (user, roll) {
 async function clearMonBox (user) {
   const users = mongoUtil.getDb().collection('users')
 
-  await users.updateOne({ username: user}, { $set: { monBox: [] } })
-  rutil.mlog(`Successfully cleared ${user}'s monster box`) 
+  await users.updateOne({ username: user }, { $set: { monBox: [] } })
+  rutil.mlog(`Successfully cleared ${user}'s monster box`)
 }
 
 module.exports = {
@@ -391,5 +400,5 @@ module.exports = {
   printRolled,
   printUsers,
   setClaims,
-  setRolls,
+  setRolls
 }

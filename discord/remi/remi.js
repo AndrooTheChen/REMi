@@ -25,7 +25,7 @@ if (args === 'debug') {
 }
 
 // connect to database
-mongoUtil.connectToServer( REMOTE_DB, (err, client) => {
+mongoUtil.connectToServer(REMOTE_DB, (err, client) => {
   if (err) rutil.log(err)
 })
 

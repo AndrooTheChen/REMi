@@ -108,28 +108,28 @@ function exec (cmd, user, msg) {
       })
       break
 
-     // testAdd 
+      // testAdd
     case 'ta':
       mongoBox.add(user, msg.content.slice([4]))
       break
 
-     // testFind
+      // testFind
     case 'tf':
       mongoBox.find(user, msg.content.slice([4]))
       break
 
     // testUpdate
     case 'tinc':
-      mongoBox.update(user, msg.content.slice([6]), inc=1)
+      mongoBox.update(user, msg.content.slice([6]), 1)
       break
 
     case 'tdec':
-      mongoBox.update(user, msg.content.slice([6]), inc=0)
+      mongoBox.update(user, msg.content.slice([6]), 0)
       break
 
     // testDelete
-    case 'td':
-      mongoBox.remove(user, msg.content.slice([4]))
+    case 'tdel':
+      mongoBox.remove(user, msg.content.slice([6]))
       break
 
     // clearMonBox
@@ -182,11 +182,12 @@ function exec (cmd, user, msg) {
  * @param {parameter} msg User command and argument(s).
  */
 function help ({ channel }) {
-  channel.send(`**%roll** - roll for a monster!
+  channel.send(`__***Commands***__
+**%roll** - roll for a monster!
 **%help** - list commands
 **%monbox** - print your monster box
 **%myrolls** - print your rolls.
-**%myclaims** - print your claims.
+**%myclaims** - print your claims.\n
 __***FAQ***__
 You have **60** seconds to claim a monster from when it is rolled.
 You may roll up to **6** times every **45** minutes
