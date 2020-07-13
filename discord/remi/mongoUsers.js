@@ -1,27 +1,10 @@
 // mongoUsers.js
 // =============
 const rutil = require('./rutil')
-const dbauth = require('./dbauth')
-const mongoActions = require('./mongoActions')
 const mongoUtil = require('./mongoUtil')
-
-// connect to DB
-const { MongoClient } = require('mongodb')
-let mongoClient
-// let db = mongoUtil.getDb()
 
 // current claim ID cycles 0-999
 let claimId = 0
-
-/**
- * This function allows us to either connecto the database running
- * on localhost or remotely using ngrok
- * @param {bool} isRemote boolean telling us to if we are connecint remotely
- */
-function setUp (isRemote) {
-  const uri = (isRemote) ? dbauth.uri : 'mongodb://localhost:27017'
-  mongoClient = new MongoClient(uri, { useUnifiedTopology: true })
-}
 
 /**
  * DEBUG
@@ -29,7 +12,6 @@ function setUp (isRemote) {
  * collections in remiDB.
  */
 function printCollections () {
-  const db = mongoClient.db('remiDB')
   mongoUtil.getDb().listCollections().toArray(function (err, results) {
     if (err) return console.log(err)
     if (results.length === 0) console.log('no collections')
@@ -60,33 +42,6 @@ function printRolled () {
     if (err) return console.log(err)
     console.log(JSON.stringify(docs))
   })
-}
-
-/**
- * Connect to remiDB. This should be called in the beginning.
- * @return {string} Returns status as `success` or `fail`
- */
-async function connectDB () {
-  try {
-    await mongoClient.connect({
-      useUnifiedTopology: true,
-      useNewUrlParser: true
-    })
-    rutil.mlog('Connected to host, looking for database')
-    db = mongoClient.db('remiDB')
-    // db = mongo_client.db("pemiDB");
-    rutil.mlog(`Connected to database ${db.databaseName}`)
-
-    // make sure rolled buffer is clear on startup
-    await db.collection('rolled').deleteMany()
-
-    // await db.collection("users").deleteMany();
-
-    return 'success'
-  } catch (ex) {
-    rutil.err(`Connection failed! Error: ${ex}`)
-    return 'fail'
-  }
 }
 
 /**
@@ -412,14 +367,6 @@ async function disenchantFromBuffer (user, roll) {
   }
 }
 
-/**
- * Close of connection to database
- */
-function shutdown () {
-  mongoClient.close()
-}
-
-
 async function clearMonBox (user) {
   const users = mongoUtil.getDb().collection('users')
 
@@ -437,7 +384,6 @@ module.exports = {
   claimMonster,
   claimMonsterById,
   clearMonBox,
-  connectDB,
   getClaimTimestamp,
   getRollTimestamp,
   printCollections,
@@ -446,7 +392,4 @@ module.exports = {
   printUsers,
   setClaims,
   setRolls,
-  setUp,
-  shutdown,
-  mongo_client: mongoClient
 }

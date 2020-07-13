@@ -7,6 +7,10 @@ let _client
 
 module.exports = {
 
+/**
+ * Connect to remiDB. This should be called in the beginning.
+ * @return {string} Returns status as `success` or `fail`
+ */
   connectToServer: (isRemote, callback) => {
     const conn_uri = (isRemote) ? dbauth.uri : "mongodb://localhost:27017"
     _client =  MongoClient.connect( conn_uri,  {
@@ -27,5 +31,5 @@ module.exports = {
   closeDB: () => {
       _client.close()
   }
-  
+
 }

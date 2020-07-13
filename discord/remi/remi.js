@@ -25,21 +25,8 @@ if (args === 'debug') {
 }
 
 // connect to database
-// mongoUser.setUp(REMOTE_DB)
-// if (NO_DB === 0) {
-//   mongoUser.connectDB().then((status) => {
-//     if (status === 'success') {
-//       rutil.log(`connectDB returned: ${status}`)
-//     } else {
-//       rutil.warn('connectDB returned failure, shutting down')
-//       process.exit(1)
-//     }
-//   })
-// }
-
 mongoUtil.connectToServer( REMOTE_DB, (err, client) => {
   if (err) rutil.log(err)
-  else rutil.log(`connectDB returned: ${client}`)
 })
 
 /**

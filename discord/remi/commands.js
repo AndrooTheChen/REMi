@@ -2,7 +2,7 @@
 // ===========
 const Discord = require('discord.js')
 const { MessageEmbed } = Discord
-const mongoActions = require('./mongoActions')
+const mongoBox = require('./mongoBox')
 const mongoUser = require('./mongoUsers')
 const monster = require('./monster')
 const rutil = require('./rutil')
@@ -110,26 +110,26 @@ function exec (cmd, user, msg) {
 
      // testAdd 
     case 'ta':
-      mongoActions.testAdd(user, msg.content.slice([4]))
+      mongoBox.add(user, msg.content.slice([4]))
       break
 
      // testFind
     case 'tf':
-      mongoActions.testFind(user, msg.content.slice([4]))
+      mongoBox.find(user, msg.content.slice([4]))
       break
 
     // testUpdate
     case 'tinc':
-      mongoActions.testIncrement(user, msg.content.slice([6]))
+      mongoBox.update(user, msg.content.slice([6]), inc=1)
       break
 
     case 'tdec':
-      mongoActions.testDecrement(user, msg.content.slice([6]))
+      mongoBox.update(user, msg.content.slice([6]), inc=0)
       break
 
     // testDelete
     case 'td':
-      mongoActions.testDelete(user, msg.content.slice([4]))
+      mongoBox.remove(user, msg.content.slice([4]))
       break
 
     // clearMonBox
