@@ -50,7 +50,6 @@ function monPrint (monBox) {
   let output = '```'
   monBox.forEach((obj) => {
     output += `Own: ${obj.qty} | ${obj.name}\n`
-    console.log(output)
   })
   output += '\n```'
   return output
