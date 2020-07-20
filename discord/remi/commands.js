@@ -2,6 +2,7 @@
 // ===========
 const Discord = require('discord.js')
 const { MessageEmbed } = Discord
+const mongoBox = require('./mongoBox')
 const mongoUser = require('./mongoUsers')
 const monster = require('./monster')
 const rutil = require('./rutil')
@@ -105,7 +106,35 @@ function exec (cmd, user, msg) {
         rutil.log(`Time diff: ${diff}`)
         msg.channel.send(`Time since last roll: ${rutil.printTimeStamp(diff)}`)
       })
+      break
 
+      // testAdd
+    case 'ta':
+      mongoBox.add(user, msg.content.slice([4]))
+      break
+
+      // testFind
+    case 'tf':
+      mongoBox.find(user, msg.content.slice([4]))
+      break
+
+    // testUpdate
+    case 'tinc':
+      mongoBox.update(user, msg.content.slice([6]), 1)
+      break
+
+    case 'tdec':
+      mongoBox.update(user, msg.content.slice([6]), 0)
+      break
+
+    // testDelete
+    case 'tdel':
+      mongoBox.remove(user, msg.content.slice([6]))
+      break
+
+    // clearMonBox
+    case 'cmb':
+      mongoUser.clearMonBox(user)
       break
 
       // %timediff
@@ -153,11 +182,12 @@ function exec (cmd, user, msg) {
  * @param {parameter} msg User command and argument(s).
  */
 function help ({ channel }) {
-  channel.send(`**%roll** - roll for a monster!
+  channel.send(`__***Commands***__
+**%roll** - roll for a monster!
 **%help** - list commands
 **%monbox** - print your monster box
 **%myrolls** - print your rolls.
-**%myclaims** - print your claims.
+**%myclaims** - print your claims.\n
 __***FAQ***__
 You have **60** seconds to claim a monster from when it is rolled.
 You may roll up to **6** times every **45** minutes
