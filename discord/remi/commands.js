@@ -47,7 +47,7 @@ function exec (cmd, user, msg) {
 
       // %roll
     case 'roll':
-    case 'reaction':
+    case 'r':
       roll(user, msg)
       break
 
