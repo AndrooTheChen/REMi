@@ -4,6 +4,7 @@ const Discord = require('discord.js')
 const client = new Discord.Client()
 const auth = require('./auth.json')
 const mongoUser = require('./mongoUsers')
+const mongoUtil = require('./mongoUtil')
 const rutil = require('./rutil')
 const cmds = require('./commands')
 
@@ -24,17 +25,9 @@ if (args === 'debug') {
 }
 
 // connect to database
-mongoUser.setUp(REMOTE_DB)
-if (NO_DB === 0) {
-  mongoUser.connectDB().then((status) => {
-    if (status === 'success') {
-      rutil.log(`connectDB returned: ${status}`)
-    } else {
-      rutil.warn('connectDB returned failure, shutting down')
-      process.exit(1)
-    }
-  })
-}
+mongoUtil.connectToServer(REMOTE_DB, (err, client) => {
+  if (err) rutil.log(err)
+})
 
 /**
  * Output console log when bot is logged in.
@@ -90,12 +83,14 @@ client.login(auth.token)
 // shut down REMi
 process.on('SIGINT', () => {
   rutil.warn('\nSIGINT received! Shutting down REMi')
-  mongoUser.shutdown()
+  // mongoUser.shutdown()
+  mongoUtil.closeDB()
   process.exit(0)
 })
 
 process.on('SIGTERM', () => {
   rutil.warn('\nSIGINT received! Shutting down REMi')
-  mongoUser.shutdown()
+  // mongoUser.shutdown()
+  mongoUtil.closeDB()
   process.exit(0)
 })

@@ -2,6 +2,7 @@
 // ===========
 const Discord = require('discord.js')
 const { MessageEmbed } = Discord
+const mongoBox = require('./mongoBox')
 const mongoUser = require('./mongoUsers')
 const monster = require('./monster')
 const rutil = require('./rutil')
@@ -105,7 +106,35 @@ function exec (cmd, user, msg) {
         rutil.log(`Time diff: ${diff}`)
         msg.channel.send(`Time since last roll: ${rutil.printTimeStamp(diff)}`)
       })
+      break
 
+      // testAdd
+    case 'ta':
+      mongoBox.add(user, msg.content.slice([4]))
+      break
+
+      // testFind
+    case 'tf':
+      mongoBox.find(user, msg.content.slice([4]))
+      break
+
+    // testUpdate
+    case 'tinc':
+      mongoBox.update(user, msg.content.slice([6]), 1)
+      break
+
+    case 'tdec':
+      mongoBox.update(user, msg.content.slice([6]), 0)
+      break
+
+    // testDelete
+    case 'tdel':
+      mongoBox.remove(user, msg.content.slice([6]))
+      break
+
+    // clearMonBox
+    case 'cmb':
+      mongoUser.clearMonBox(user)
       break
 
       // %timediff
@@ -153,11 +182,12 @@ function exec (cmd, user, msg) {
  * @param {parameter} msg User command and argument(s).
  */
 function help ({ channel }) {
-  channel.send(`**%roll** - roll for a monster!
+  channel.send(`__***Commands***__
+**%roll** - roll for a monster!
 **%help** - list commands
 **%monbox** - print your monster box
 **%myrolls** - print your rolls.
-**%myclaims** - print your claims.
+**%myclaims** - print your claims.\n
 __***FAQ***__
 You have **60** seconds to claim a monster from when it is rolled.
 You may roll up to **6** times every **45** minutes
@@ -307,20 +337,21 @@ function monbox (user, msg) {
 
     // sets curpage as the first argument after cmd
     // sets lastpage as last page possible of monBox
+    const pagesize = 15
     const arguments = msg.content.split(' ').slice(start=1)
     let curpage = (arguments.length===0)? 1 : +arguments[0]
-    const lastpage = Math.floor((monBox.length-1)/10) + 1
+    const lastpage = Math.floor((monBox.length-1)/pagesize) + 1
 
     //sort monster box alphabetically (may give options later)
-    monBox.sort()
-    
+    monBox.sort((a,b)=> (a.name > b.name)? 1 : -1)
+
     //check curpage as viable
     if (!Number.isInteger(curpage) || curpage < 1 || curpage > lastpage ) {
       msg.channel.send('```Invalid arguments for monster box.```')
     } else {
 
       //message
-      const m = msg.channel.send(`**${user}'s** monster box: ${rutil.monPrint(monBox,curpage)}`)
+      const m = msg.channel.send(`**${user}'s** monster box: ${rutil.monPrint(monBox,curpage)} Page ${curpage}/${lastpage}`)
       .then(function (msg){
         msg.react('⬅')
         msg.react('➡')
@@ -333,13 +364,13 @@ function monbox (user, msg) {
         prevCollector.on('collect', (reaction, user) => {
           if (curpage === 1) return
           curpage -= 1
-          msg.edit(`**${user}'s** monster box: ${rutil.monPrint(monBox,curpage)}`)
+          msg.edit(`**${user}'s** monster box: ${rutil.monPrint(monBox,curpage)} Page ${curpage}/${lastpage}`)
           rutil.log(`Collected ${reaction.emoji.name} from ${user.tag}`)
         })
         nextCollector.on('collect', (reaction, user) => {
           if (curpage === lastpage) return
           curpage += 1
-          msg.edit(`**${user}'s** monster box: ${rutil.monPrint(monBox,curpage)}`)
+          msg.edit(`**${user}'s** monster box: ${rutil.monPrint(monBox,curpage)} Page ${curpage}/${lastpage}`)
           rutil.log(`Collected ${reaction.emoji.name} from ${user.tag}`)
         })
         prevCollector.on('end', () => rutil.log(`${user}'s monster box page timed out.`))
