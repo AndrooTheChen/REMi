@@ -46,9 +46,10 @@ function getTimeStamp () {
  * Build the string to print a user's monster box.
  * @param {array} monBox List containing a user's monster box
  */
-function monPrint (monBox) {
+function monPrint (monBox, pagenum) {
   let output = '```'
-  monBox.forEach((obj) => {
+  let page = monBox.slice(15*(pagenum-1),15*pagenum)
+  page.forEach((obj) => {
     output += `Own: ${obj.qty} | ${obj.name}\n`
   })
   output += '\n```'
